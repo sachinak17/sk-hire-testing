@@ -3,6 +3,14 @@
  * Manages Sign In, Sign Up, Role Selection, Password Strength, Demo Logins, and Social OAuth Simulation.
  */
 
+import { 
+  firebaseSignIn, 
+  firebaseSignUp, 
+  firebaseGoogleSignIn, 
+  firebasePasswordReset, 
+  firebaseSignOut 
+} from './firebase-config.js';
+
 const STORAGE_KEYS = {
   THEME: 'hirecraft_theme',
   AUTH_USER: 'hirecraft_auth_user'
@@ -184,15 +192,26 @@ class AuthController {
 
     // Forgot password form submit
     const forgotForm = document.getElementById('forgot-pwd-form');
-    forgotForm?.addEventListener('submit', (e) => {
+    forgotForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const resetInput = document.getElementById('forgot-email-input');
-      if (!resetInput?.value) {
+      const email = resetInput?.value?.trim();
+      if (!email || !email.includes('@')) {
         this.showToast('Please provide a valid email address.', 'error');
         return;
       }
-      this.showToast(`Password recovery link sent to ${resetInput.value}!`, 'success');
-      modalOverlay?.classList.remove('active');
+      this.showToast('Sending password reset email via Firebase...', 'info');
+      try {
+        const result = await firebasePasswordReset(email);
+        if (result.success) {
+          this.showToast(`Password recovery link sent to ${email} via Firebase!`, 'success');
+          modalOverlay?.classList.remove('active');
+        } else {
+          this.showToast(result.error, 'error');
+        }
+      } catch (err) {
+        this.showToast(err.message || 'Could not send reset email.', 'error');
+      }
     });
 
     // Continue as already logged in button
@@ -200,7 +219,10 @@ class AuthController {
       window.location.href = 'index.html';
     });
 
-    document.getElementById('btn-logout-current')?.addEventListener('click', () => {
+    document.getElementById('btn-logout-current')?.addEventListener('click', async () => {
+      try {
+        await firebaseSignOut();
+      } catch (e) {}
       localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
       const banner = document.getElementById('already-logged-in-banner');
       if (banner) banner.style.display = 'none';
@@ -269,7 +291,7 @@ class AuthController {
     return score;
   }
 
-  handleSignIn() {
+  async handleSignIn() {
     const email = document.getElementById('signin-email')?.value.trim();
     const password = document.getElementById('signin-password')?.value;
     const rememberMe = document.getElementById('signin-remember')?.checked;
@@ -291,41 +313,66 @@ class AuthController {
     submitBtn?.classList.add('loading');
     submitBtn?.setAttribute('disabled', 'true');
 
-    setTimeout(() => {
-      // Determine user name and role based on input or default
-      let name = 'Candidate User';
-      let role = 'Candidate';
-      if (email.toLowerCase().includes('recruiter') || email.toLowerCase().includes('talent')) {
-        name = 'Priya Sharma (Recruiter)';
-        role = 'Recruiter';
-      } else if (email.toLowerCase().includes('sachin')) {
-        name = 'Sachin A K';
-        role = 'Candidate';
-      } else {
-        name = email.split('@')[0].replace('.', ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const isDemo = email.includes('candidate@skhire.dev') || email.includes('recruiter@techcorp.io');
+
+    try {
+      // 1. Attempt Firebase Authentication
+      const result = await firebaseSignIn(email, password);
+
+      if (result.success) {
+        this.showToast(`Welcome back, ${result.user.name}! Redirecting...`, 'success');
+        setTimeout(() => {
+          const params = new URLSearchParams(window.location.search);
+          const redirect = params.get('redirect') || 'index.html';
+          window.location.href = redirect;
+        }, 800);
+        return;
       }
 
-      const user = {
-        name,
-        email,
-        role,
-        avatar: name.slice(0, 2).toUpperCase(),
-        rememberMe: Boolean(rememberMe),
-        joinedAt: new Date().toISOString()
-      };
+      // If it is a demo account and not yet created in Firebase, auto-create in Firebase or use local fallback
+      if (isDemo) {
+        const isRecruiter = email.includes('recruiter');
+        const demoName = isRecruiter ? 'Priya Sharma (Recruiter)' : 'Sachin A K';
+        const demoRole = isRecruiter ? 'Recruiter' : 'Candidate';
 
-      localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(user));
-      this.showToast(`Welcome back, ${name}! Redirecting...`, 'success');
+        const regResult = await firebaseSignUp(demoName, email, password, demoRole);
+        if (regResult.success) {
+          this.showToast(`Welcome, ${demoName}! (Demo synced with Firebase)`, 'success');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 800);
+          return;
+        }
 
-      setTimeout(() => {
-        const params = new URLSearchParams(window.location.search);
-        const redirect = params.get('redirect') || 'index.html';
-        window.location.href = redirect;
-      }, 1000);
-    }, 850);
+        // Local fallback for demo
+        const user = {
+          name: demoName,
+          email,
+          role: demoRole,
+          avatar: demoName.slice(0, 2).toUpperCase(),
+          rememberMe: Boolean(rememberMe),
+          joinedAt: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(user));
+        this.showToast(`Welcome back, ${demoName}! Redirecting...`, 'success');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 800);
+        return;
+      }
+
+      // Real user authentication error
+      this.showToast(result.error, 'error');
+      submitBtn?.classList.remove('loading');
+      submitBtn?.removeAttribute('disabled');
+    } catch (err) {
+      this.showToast(err.message || 'Authentication error.', 'error');
+      submitBtn?.classList.remove('loading');
+      submitBtn?.removeAttribute('disabled');
+    }
   }
 
-  handleSignUp() {
+  async handleSignUp() {
     const name = document.getElementById('reg-name')?.value.trim();
     const email = document.getElementById('reg-email')?.value.trim();
     const password = document.getElementById('reg-password')?.value;
@@ -366,36 +413,51 @@ class AuthController {
     submitBtn?.classList.add('loading');
     submitBtn?.setAttribute('disabled', 'true');
 
-    setTimeout(() => {
-      const role = roleRadio?.value === 'recruiter' ? 'Recruiter' : 'Candidate';
-      const user = {
-        name,
-        email,
-        role,
-        avatar: name.slice(0, 2).toUpperCase(),
-        joinedAt: new Date().toISOString()
-      };
+    const role = roleRadio?.value === 'recruiter' ? 'Recruiter' : 'Candidate';
 
-      localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(user));
-      this.showToast(`Account created successfully! Welcome to SK Hire, ${name}.`, 'success');
+    try {
+      const result = await firebaseSignUp(name, email, password, role);
 
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1000);
-    }, 900);
+      if (result.success) {
+        this.showToast(`Account created in Firebase! Welcome to SK Hire, ${name}.`, 'success');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 900);
+      } else {
+        this.showToast(result.error, 'error');
+        submitBtn?.classList.remove('loading');
+        submitBtn?.removeAttribute('disabled');
+      }
+    } catch (err) {
+      this.showToast(err.message || 'Registration failed.', 'error');
+      submitBtn?.classList.remove('loading');
+      submitBtn?.removeAttribute('disabled');
+    }
   }
 
-  handleSocialLogin(provider) {
+  async handleSocialLogin(provider) {
+    if (provider === 'google') {
+      this.showToast('Opening Google Sign-In with Firebase...', 'info');
+      try {
+        const result = await firebaseGoogleSignIn();
+        if (result.success) {
+          this.showToast(`Signed in via Google as ${result.user.name}! Redirecting...`, 'success');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 900);
+        } else {
+          this.showToast(result.error, 'info');
+        }
+      } catch (err) {
+        this.showToast(err.message || 'Google Sign-In failed.', 'error');
+      }
+      return;
+    }
+
     this.showToast(`Connecting to ${provider.toUpperCase()}...`, 'info');
 
     setTimeout(() => {
       const mockUsers = {
-        google: {
-          name: 'Alex Chen',
-          email: 'alex.chen@gmail.com',
-          role: 'Candidate',
-          avatar: 'AC'
-        },
         github: {
           name: 'Dev Rohan',
           email: 'rohan.codes@github.com',

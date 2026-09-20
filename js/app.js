@@ -12,6 +12,7 @@ import { DashboardModule } from './modules/dashboard.js';
 import { DSA_PROBLEMS } from './data/dsaSheetData.js';
 import { COMPANIES_DATA } from './data/companiesData.js';
 import { INITIAL_JOBS } from './data/jobsData.js';
+import { firebaseSignOut } from './firebase-config.js';
 
 class App {
   constructor() {
@@ -239,7 +240,10 @@ class App {
         this.switchView('jobs');
       });
 
-      authContainer.querySelector('#btn-menu-logout')?.addEventListener('click', () => {
+      authContainer.querySelector('#btn-menu-logout')?.addEventListener('click', async () => {
+        try {
+          await firebaseSignOut();
+        } catch (e) {}
         state.logout();
         this.showToast('You have been signed out. Redirecting...', 'info');
         setTimeout(() => {
