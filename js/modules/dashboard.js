@@ -24,7 +24,8 @@ export class DashboardModule {
         event === 'application_submitted' ||
         event === 'dsa_solved_change' ||
         event === 'quiz_completed' ||
-        event === 'state_reset'
+        event === 'state_reset' ||
+        event === 'auth_change'
       ) {
         this.render();
       }
@@ -77,8 +78,47 @@ export class DashboardModule {
     const allJobs = [...state.customJobs, ...INITIAL_JOBS];
     const savedJobs = allJobs.filter(j => state.isJobSaved(j.id));
     const applications = state.applications;
+    const currentUser = state.getCurrentUser();
+
+    const userBannerHtml = currentUser
+      ? `
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.1)); border: 1px solid var(--border-accent); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px var(--primary-glow);">
+              ${currentUser.avatar || 'U'}
+            </div>
+            <div>
+              <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">
+                Welcome back, ${currentUser.name}! 👋
+              </div>
+              <div style="font-size: 0.84rem; color: var(--text-secondary);">
+                Active Role: <span style="color: var(--primary); font-weight: 600;">${currentUser.role || 'Candidate'}</span> • ${currentUser.email}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 0.8rem; background: var(--bg-surface); padding: 6px 14px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle); color: var(--accent-emerald); font-weight: 600;">
+              ● Profile Active & Synced
+            </span>
+          </div>
+        </div>
+      `
+      : `
+        <div style="background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 1.4rem;">💡</span>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);">
+              <strong>Browsing as Guest:</strong> Sign in to sync your applications, DSA notes, and bookmarks across devices.
+            </div>
+          </div>
+          <a href="login.html" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.84rem; text-decoration: none;">
+            Sign In / Register →
+          </a>
+        </div>
+      `;
 
     container.innerHTML = `
+      ${userBannerHtml}
       <div class="dashboard-grid">
         <!-- Left: Readiness Score Card -->
         <div class="readiness-card">

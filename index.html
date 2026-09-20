@@ -7,9 +7,24 @@
   <meta name="description" content="SK Hire - Discover top tech jobs and internships, master Aptitude, Core Technical CS, and HR interviews, explore company hiring processes, and conquer the dedicated topic-wise DSA Sheet." />
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
   
+  <!-- Authentication Guard: Require Login Before Opening Portal -->
+  <script>
+    (function() {
+      try {
+        var user = localStorage.getItem('hirecraft_auth_user');
+        if (!user) {
+          window.location.replace('login.html');
+        }
+      } catch (err) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/auth.css" />
 </head>
 <body>
 
@@ -42,6 +57,11 @@
           <button class="btn-post-job" id="btn-open-post-job">
             <span>+</span> Post a Job
           </button>
+          <div id="nav-auth-container">
+            <a href="login.html" class="btn-nav-signin" id="btn-nav-login">
+              <span>👤</span> Sign In
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -557,6 +577,7 @@
           <a href="#companies" onclick="window.SKHireApp ? window.SKHireApp.switchView('companies') : window.HireCraftApp.switchView('companies')">Companies</a>
           <a href="#dsa" onclick="window.SKHireApp ? window.SKHireApp.switchView('dsa') : window.HireCraftApp.switchView('dsa')">DSA Sheet</a>
           <a href="#dashboard" onclick="window.SKHireApp ? window.SKHireApp.switchView('dashboard') : window.HireCraftApp.switchView('dashboard')">Dashboard</a>
+          <a href="login.html" id="footer-auth-link">Sign In / Register</a>
         </div>
       </div>
     </div>

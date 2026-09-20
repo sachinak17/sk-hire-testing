@@ -11,7 +11,8 @@ const STORAGE_KEYS = {
   DSA_STARRED: 'hirecraft_dsa_starred',
   DSA_NOTES: 'hirecraft_dsa_notes',
   QUIZ_HISTORY: 'hirecraft_quiz_history',
-  CUSTOM_JOBS: 'hirecraft_custom_jobs'
+  CUSTOM_JOBS: 'hirecraft_custom_jobs',
+  AUTH_USER: 'hirecraft_auth_user'
 };
 
 class StateManager {
@@ -24,6 +25,7 @@ class StateManager {
     this.dsaNotes = JSON.parse(localStorage.getItem(STORAGE_KEYS.DSA_NOTES) || '{}');
     this.quizHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUIZ_HISTORY) || '[]');
     this.customJobs = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_JOBS) || '[]');
+    this.currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.AUTH_USER) || 'null');
     this.listeners = [];
   }
 
@@ -162,6 +164,31 @@ class StateManager {
     localStorage.setItem(STORAGE_KEYS.QUIZ_HISTORY, JSON.stringify(this.quizHistory));
     this.notify('quiz_completed', record);
     return record;
+  }
+
+  // Authentication
+  getCurrentUser() {
+    return this.currentUser;
+  }
+
+  isAuthenticated() {
+    return Boolean(this.currentUser);
+  }
+
+  login(userData) {
+    this.currentUser = {
+      ...userData,
+      lastLogin: new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(this.currentUser));
+    this.notify('auth_change', this.currentUser);
+    return this.currentUser;
+  }
+
+  logout() {
+    this.currentUser = null;
+    localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+    this.notify('auth_change', null);
   }
 
   // Reset demo data

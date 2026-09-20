@@ -20,6 +20,12 @@ class App {
   }
 
   init() {
+    // 0. Auth Enforcement: Ensure user starts with login page if unauthenticated
+    if (!state.isAuthenticated()) {
+      window.location.replace('login.html');
+      return;
+    }
+
     // 1. Initialize Theme
     state.setTheme(state.theme);
     this.bindGlobalEvents();
@@ -37,12 +43,16 @@ class App {
     this.modules.dsa.init();
     this.modules.dashboard.init();
 
-    // 3. Update Hero Metrics
+    // 3. Update Hero Metrics & Auth State
     this.updateHeroMetrics();
+    this.updateAuthNav();
 
-    // 4. State listeners for dynamic metric updates
-    state.subscribe(() => {
+    // 4. State listeners for dynamic metric updates & auth
+    state.subscribe((event) => {
       this.updateHeroMetrics();
+      if (event === 'auth_change') {
+        this.updateAuthNav();
+      }
     });
 
     // Check if URL hash specifies initial view
@@ -98,6 +108,15 @@ class App {
           overlay.classList.remove('active');
         }
       });
+    });
+
+    // Close user profile dropdown on outside click
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('user-dropdown-menu');
+      const trigger = document.getElementById('user-profile-trigger');
+      if (menu && !menu.contains(e.target) && !trigger?.contains(e.target)) {
+        menu.classList.remove('active');
+      }
     });
   }
 
@@ -165,6 +184,75 @@ class App {
       toast.style.transition = 'all 0.25s ease';
       setTimeout(() => toast.remove(), 250);
     }, 3200);
+  }
+
+  updateAuthNav() {
+    const authContainer = document.getElementById('nav-auth-container');
+    if (!authContainer) return;
+
+    const user = state.getCurrentUser();
+    if (user) {
+      authContainer.innerHTML = `
+        <div class="user-account-badge" id="user-account-badge">
+          <button type="button" class="user-profile-trigger" id="user-profile-trigger" aria-haspopup="true" aria-expanded="false" title="Account Menu">
+            <div class="user-avatar-circle">${user.avatar || 'U'}</div>
+            <div class="user-profile-meta">
+              <span class="user-profile-name">${user.name.split(' ')[0]}</span>
+              <span class="user-profile-role">${user.role || 'Member'}</span>
+            </div>
+            <span style="font-size: 0.65rem; color: var(--text-muted); margin-left: 2px;">▼</span>
+          </button>
+          <div class="user-dropdown-menu" id="user-dropdown-menu">
+            <div style="padding: 6px 12px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 4px;">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">${user.name}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${user.email}</div>
+            </div>
+            <button class="user-dropdown-item" id="btn-menu-dashboard">
+              <span>📊</span> My Dashboard
+            </button>
+            <button class="user-dropdown-item" id="btn-menu-saved">
+              <span>⭐</span> Bookmarked Roles (${state.savedJobIds.size})
+            </button>
+            <div style="height: 1px; background: var(--border-subtle); margin: 4px 0;"></div>
+            <button class="user-dropdown-item text-danger" id="btn-menu-logout">
+              <span>🚪</span> Sign Out
+            </button>
+          </div>
+        </div>
+      `;
+
+      const trigger = authContainer.querySelector('#user-profile-trigger');
+      const menu = authContainer.querySelector('#user-dropdown-menu');
+
+      trigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu?.classList.toggle('active');
+      });
+
+      authContainer.querySelector('#btn-menu-dashboard')?.addEventListener('click', () => {
+        menu?.classList.remove('active');
+        this.switchView('dashboard');
+      });
+
+      authContainer.querySelector('#btn-menu-saved')?.addEventListener('click', () => {
+        menu?.classList.remove('active');
+        this.switchView('jobs');
+      });
+
+      authContainer.querySelector('#btn-menu-logout')?.addEventListener('click', () => {
+        state.logout();
+        this.showToast('You have been signed out. Redirecting...', 'info');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 500);
+      });
+    } else {
+      authContainer.innerHTML = `
+        <a href="login.html" class="btn-nav-signin" id="btn-nav-login">
+          <span>👤</span> Sign In
+        </a>
+      `;
+    }
   }
 }
 
