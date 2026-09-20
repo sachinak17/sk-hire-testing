@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In & Register | SK Hire - Zero to Hero</title>
+  <meta name="description" content="Sign in to your SK Hire account to access tech job openings, company hiring blueprints, interview preparation modules, and the curated DSA Sheet." />
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="auth-page">
+
+  <!-- Ambient Animated Mesh Glow Background -->
+  <div class="auth-ambient-bg" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- Central Split Auth Container -->
+  <main class="auth-wrapper" role="main">
+
+    <!-- Left Brand Showcase Panel -->
+    <aside class="auth-showcase-panel">
+      <div class="showcase-header">
+        <a href="login.html" class="showcase-brand" title="SK Hire - Zero to Hero">
+          <img src="assets/logo.jpg" alt="SK Hire Logo" class="showcase-brand-logo" />
+          <div class="showcase-brand-text">
+            <span>SK Hire</span>
+            <span class="brand-badge">Zero to Hero</span>
+          </div>
+        </a>
+
+        <h1 class="showcase-headline">
+          Accelerate Your Career From <br />
+          <span class="gradient-text">Zero to Hero</span>
+        </h1>
+        <p class="showcase-desc">
+          The all-in-one platform for top-tier job opportunities, company-specific hiring blueprints, technical interview prep, and curated DSA problems.
+        </p>
+      </div>
+
+      <!-- Highlights List -->
+      <div class="showcase-features">
+        <div class="showcase-feature-item">
+          <div class="feature-icon-box">💼</div>
+          <div class="feature-info">
+            <h4>Verified Tech Roles & Internships</h4>
+            <p>Direct applications, salary benchmarks, and tailored eligibility filters.</p>
+          </div>
+        </div>
+
+        <div class="showcase-feature-item">
+          <div class="feature-icon-box">⚡</div>
+          <div class="feature-info">
+            <h4>Curated Topic-wise DSA Sheet</h4>
+            <p>Zero to Hero hand-picked challenges with time complexities and note-taking.</p>
+          </div>
+        </div>
+
+        <div class="showcase-feature-item">
+          <div class="feature-icon-box">🏢</div>
+          <div class="feature-info">
+            <h4>Company Hiring Blueprints</h4>
+            <p>Interview rounds, core questions, and packages for tier-1 tech firms.</p>
+          </div>
+        </div>
+
+        <div class="showcase-feature-item">
+          <div class="feature-icon-box">🎯</div>
+          <div class="feature-info">
+            <h4>Placement Readiness Score</h4>
+            <p>Track your preparation mastery and stay accountable every day.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Proof Badge -->
+      <div class="showcase-proof-card">
+        <div class="proof-avatar-group">
+          <div class="proof-avatar" style="background: linear-gradient(135deg, #6366f1, #06b6d4);">SK</div>
+          <div class="proof-avatar" style="background: linear-gradient(135deg, #10b981, #059669);">PS</div>
+          <div class="proof-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">AC</div>
+          <div class="proof-avatar" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">+</div>
+        </div>
+        <div class="proof-text">
+          Joined by <strong>12,000+ ambitious developers</strong> cracking top tech roles.
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Interactive Authentication Form Panel -->
+    <section class="auth-form-panel">
+      <!-- Top Action Bar -->
+      <div class="auth-top-actions">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+            Secure Portal
+          </span>
+          <span style="font-size: 0.72rem; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); padding: 2px 8px; border-radius: var(--radius-full); font-weight: 700;">
+            ● Online
+          </span>
+        </div>
+        <button type="button" class="auth-theme-toggle" id="auth-theme-toggle" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+          ☀️
+        </button>
+      </div>
+
+      <!-- Active Session Detected Banner -->
+      <div class="already-logged-in-banner" id="already-logged-in-banner">
+        <div class="session-banner-content">
+          <div class="session-user-info">
+            <span class="session-avatar-dot"></span>
+            <div class="session-user-text">
+              Signed in as <span class="session-user-name" id="current-logged-user-name">User</span>
+            </div>
+          </div>
+          <div class="session-actions">
+            <button type="button" class="btn-session-continue" id="btn-continue-session">Enter Portal →</button>
+            <button type="button" class="btn-session-logout" id="btn-logout-current">Sign Out</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Header -->
+      <div class="auth-header">
+        <h2 class="auth-title" id="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle" id="auth-subtitle">Access your career dashboard, tracked jobs, and interview prep.</p>
+      </div>
+
+      <!-- Fast Demo Accounts Strip -->
+      <div class="demo-accounts-strip" id="demo-accounts-strip">
+        <div class="demo-label">
+          <span>🚀</span> Fast Demo Access:
+        </div>
+        <div class="demo-buttons-group">
+          <button type="button" class="btn-demo-fill" id="btn-demo-candidate" title="Autofill Candidate demo account">
+            <span>👤</span> Candidate Demo
+          </button>
+          <button type="button" class="btn-demo-fill" id="btn-demo-recruiter" title="Autofill Recruiter demo account">
+            <span>💼</span> Recruiter Demo
+          </button>
+        </div>
+      </div>
+
+      <!-- Nav Tabs: Sign In vs Sign Up -->
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab-btn active" id="tab-btn-login" role="tab" aria-selected="true">
+          Sign In
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-btn-register" role="tab" aria-selected="false">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Social Login Buttons Grid -->
+      <div class="social-buttons-grid">
+        <button type="button" class="btn-social" data-provider="google" title="Continue with Google">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span>Google</span>
+        </button>
+
+        <button type="button" class="btn-social" data-provider="github" title="Continue with GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </button>
+
+        <button type="button" class="btn-social" data-provider="linkedin" title="Continue with LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="#0A66C2">
+            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+          </svg>
+          <span>LinkedIn</span>
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="auth-divider">
+        <span>or continue with email</span>
+      </div>
+
+      <!-- ====================================================================
+           Form 1: Sign In
+           ==================================================================== -->
+      <form id="form-signin" class="auth-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="signin-email">Email Address</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">✉️</span>
+            <input 
+              type="email" 
+              id="signin-email" 
+              class="auth-input" 
+              placeholder="sachin.candidate@skhire.dev" 
+              required 
+              autocomplete="email" 
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signin-password">Password</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">🔒</span>
+            <input 
+              type="password" 
+              id="signin-password" 
+              class="auth-input has-right-icon" 
+              placeholder="Enter your password" 
+              required 
+              autocomplete="current-password" 
+            />
+            <button 
+              type="button" 
+              class="input-icon-right btn-toggle-pwd" 
+              data-target="signin-password" 
+              title="Show/Hide Password" 
+              aria-label="Toggle password visibility"
+            >
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div class="form-helper-row">
+          <label class="checkbox-label" for="signin-remember">
+            <input type="checkbox" id="signin-remember" checked />
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="auth-forgot-link" id="link-forgot-pwd">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-auth-submit" id="btn-submit-signin">
+          <span class="btn-text">Sign In to SK Hire →</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </form>
+
+      <!-- ====================================================================
+           Form 2: Sign Up / Register (Initially Hidden)
+           ==================================================================== -->
+      <form id="form-signup" class="auth-form" style="display: none;" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">👤</span>
+            <input 
+              type="text" 
+              id="reg-name" 
+              class="auth-input" 
+              placeholder="e.g. Alex Chen" 
+              required 
+              autocomplete="name" 
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Work / Personal Email</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">✉️</span>
+            <input 
+              type="email" 
+              id="reg-email" 
+              class="auth-input" 
+              placeholder="alex.chen@example.com" 
+              required 
+              autocomplete="email" 
+            />
+          </div>
+        </div>
+
+        <!-- Role Selector Pills -->
+        <div class="form-group">
+          <label class="form-label">I am joining as:</label>
+          <div class="role-pills-selector">
+            <div class="role-pill-option">
+              <input type="radio" name="reg-role" id="role-candidate" value="candidate" checked />
+              <label for="role-candidate" class="role-pill-label">
+                <span class="role-icon">🎓</span>
+                <span>Job Seeker / Student</span>
+                <small>Looking for Roles & Prep</small>
+              </label>
+            </div>
+            <div class="role-pill-option">
+              <input type="radio" name="reg-role" id="role-recruiter" value="recruiter" />
+              <label for="role-recruiter" class="role-pill-label">
+                <span class="role-icon">🏢</span>
+                <span>Recruiter / Employer</span>
+                <small>Hire & Post Openings</small>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password with Real-time Strength Meter -->
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Create Password</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">🔒</span>
+            <input 
+              type="password" 
+              id="reg-password" 
+              class="auth-input has-right-icon" 
+              placeholder="Minimum 6 characters" 
+              required 
+              autocomplete="new-password" 
+            />
+            <button 
+              type="button" 
+              class="input-icon-right btn-toggle-pwd" 
+              data-target="reg-password" 
+              title="Show/Hide Password" 
+              aria-label="Toggle password visibility"
+            >
+              👁️
+            </button>
+          </div>
+
+          <!-- Password Strength Indicator -->
+          <div class="pwd-strength-container">
+            <div class="pwd-strength-bars">
+              <div class="pwd-bar" id="pwd-bar-1"></div>
+              <div class="pwd-bar" id="pwd-bar-2"></div>
+              <div class="pwd-bar" id="pwd-bar-3"></div>
+              <div class="pwd-bar" id="pwd-bar-4"></div>
+            </div>
+            <div class="pwd-strength-text">
+              <span>Security level:</span>
+              <span class="pwd-status-label" id="pwd-strength-label">None</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label class="form-label" for="reg-confirm-password">Confirm Password</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">🔒</span>
+            <input 
+              type="password" 
+              id="reg-confirm-password" 
+              class="auth-input has-right-icon" 
+              placeholder="Re-enter your password" 
+              required 
+              autocomplete="new-password" 
+            />
+            <button 
+              type="button" 
+              class="input-icon-right btn-toggle-pwd" 
+              data-target="reg-confirm-password" 
+              title="Show/Hide Password" 
+              aria-label="Toggle password visibility"
+            >
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <!-- Terms Agreement -->
+        <div class="form-helper-row">
+          <label class="checkbox-label" for="reg-terms">
+            <input type="checkbox" id="reg-terms" checked required />
+            <span>I agree to the <a href="#" style="color: var(--primary); text-decoration: underline;">Terms of Service</a> & <a href="#" style="color: var(--primary); text-decoration: underline;">Privacy Policy</a></span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-auth-submit" id="btn-submit-signup">
+          <span class="btn-text">Create Free Account →</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </form>
+
+      <p class="auth-terms-note">
+        Protected by SK Hire Enterprise Security. By continuing, you agree to our 
+        <a href="#">Terms of Use</a> and <a href="#">Cookie Policy</a>.
+      </p>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       Forgot Password Modal
+       ======================================================================== -->
+  <div class="auth-modal-overlay" id="auth-forgot-modal" role="dialog" aria-modal="true" aria-labelledby="forgot-modal-title">
+    <div class="auth-modal-card">
+      <div class="modal-head-row">
+        <h3 id="forgot-modal-title">Reset Your Password</h3>
+        <button type="button" class="modal-dismiss-btn" id="modal-close-forgot" title="Close" aria-label="Close dialog">✕</button>
+      </div>
+      <p style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.45;">
+        Enter your registered email address. We'll send a password recovery link to your inbox.
+      </p>
+
+      <form id="forgot-pwd-form" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" for="forgot-email-input">Account Email</label>
+          <div class="input-with-icon">
+            <span class="input-icon-left">✉️</span>
+            <input 
+              type="email" 
+              id="forgot-email-input" 
+              class="auth-input" 
+              placeholder="Enter your registered email" 
+              required 
+            />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="submit" class="btn-auth-submit" style="margin-top: 0; flex: 1;">
+            <span>Send Recovery Link</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Auth Controller Script with Firebase Module -->
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>
