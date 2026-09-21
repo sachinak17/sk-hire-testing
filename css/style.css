@@ -6,55 +6,55 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Royal Solar Flame & Luxe Gold - Dark Mode Palette (Default) */
-  --bg-base: #090706;
-  --bg-surface: #120e0c;
-  --bg-surface-elevated: #1c1511;
-  --bg-surface-hover: #261d17;
-  --border-subtle: rgba(245, 158, 11, 0.12);
-  --border-accent: rgba(255, 107, 43, 0.45);
-  --border-glow: rgba(245, 158, 11, 0.4);
+  /* Luxe Light Purple & Electric Lavender - Dark Mode Palette (Default) */
+  --bg-base: #0a0714;
+  --bg-surface: #120d22;
+  --bg-surface-elevated: #1a1330;
+  --bg-surface-hover: #251b44;
+  --border-subtle: rgba(192, 132, 252, 0.14);
+  --border-accent: rgba(192, 132, 252, 0.45);
+  --border-glow: rgba(168, 85, 247, 0.45);
   
-  --text-primary: #fffdfa;
-  --text-secondary: #d8cbbe;
-  --text-muted: #8e8073;
-  --text-inverse: #090706;
+  --text-primary: #faf5ff;
+  --text-secondary: #d8b4fe;
+  --text-muted: #8e7ea8;
+  --text-inverse: #0a0714;
 
-  /* Royal Solar Flame Brand Accents */
-  --primary: #ff6b2b;
-  --primary-hover: #f97316;
-  --primary-glow: rgba(255, 107, 43, 0.45);
+  /* Light Purple & Complementary Accents */
+  --primary: #c084fc;
+  --primary-hover: #a855f7;
+  --primary-glow: rgba(192, 132, 252, 0.45);
   
-  --secondary: #f59e0b;
-  --secondary-glow: rgba(245, 158, 11, 0.4);
+  --secondary: #818cf8;
+  --secondary-glow: rgba(129, 140, 248, 0.4);
 
-  --accent-gold: #ffd700;
-  --accent-gold-glow: rgba(255, 215, 0, 0.45);
-  --accent-ruby: #e11d48;
-  --accent-ruby-glow: rgba(225, 29, 72, 0.35);
-  --accent-emerald: #10b981;
-  --accent-emerald-glow: rgba(16, 185, 129, 0.3);
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-  --accent-copper: #ea580c;
+  --accent-purple-light: #e9d5ff;
+  --accent-cyan: #38bdf8;
+  --accent-cyan-glow: rgba(56, 189, 248, 0.35);
+  --accent-pink: #f472b6;
+  --accent-pink-glow: rgba(244, 114, 182, 0.35);
+  --accent-emerald: #34d399;
+  --accent-emerald-glow: rgba(52, 211, 153, 0.35);
+  --accent-amber: #fbbf24;
+  --accent-rose: #fb7185;
 
-  /* Signatures: Luxury Flame & Gold Foil */
-  --gradient-aurora: linear-gradient(135deg, #ff4500 0%, #ff7300 35%, #f59e0b 70%, #ffd700 100%);
-  --gradient-cta: linear-gradient(135deg, #ff4500 0%, #f97316 45%, #f59e0b 100%);
-  --gradient-hero: linear-gradient(135deg, #fff4d4 0%, #ffd700 25%, #ff7300 65%, #e11d48 100%);
-  --gradient-card-top: linear-gradient(90deg, #ff4500, #f59e0b, #ffd700);
-  --gradient-gold: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+  /* Signatures: Luxury Light Purple, Lilac & Celestial Glow */
+  --gradient-aurora: linear-gradient(135deg, #c084fc 0%, #a855f7 35%, #818cf8 70%, #38bdf8 100%);
+  --gradient-cta: linear-gradient(135deg, #c084fc 0%, #a855f7 45%, #7c3aed 100%);
+  --gradient-hero: linear-gradient(135deg, #ffffff 0%, #f3e8ff 25%, #c084fc 60%, #38bdf8 100%);
+  --gradient-card-top: linear-gradient(90deg, #c084fc, #818cf8, #38bdf8);
+  --gradient-gold: linear-gradient(135deg, #d8b4fe 0%, #f5f3ff 25%, #c084fc 50%, #faf5ff 75%, #a855f7 100%);
 
   /* Glassmorphism */
-  --glass-bg: rgba(18, 14, 12, 0.82);
-  --glass-border: rgba(245, 158, 11, 0.16);
+  --glass-bg: rgba(18, 13, 34, 0.82);
+  --glass-border: rgba(192, 132, 252, 0.16);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.55);
 
   /* Elevation */
   --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
   --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.48);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.65);
-  --shadow-glow: 0 0 40px -10px rgba(255, 107, 43, 0.45);
+  --shadow-glow: 0 0 40px -10px rgba(192, 132, 252, 0.45);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -71,42 +71,43 @@
 }
 
 [data-theme="light"] {
-  --bg-base: #fdfaf6;
+  --bg-base: #fbf9fe;
   --bg-surface: #ffffff;
-  --bg-surface-elevated: #f9f3ea;
-  --bg-surface-hover: #f3e8da;
-  --border-subtle: rgba(180, 83, 9, 0.12);
-  --border-accent: rgba(234, 88, 12, 0.35);
-  --border-glow: rgba(245, 158, 11, 0.3);
+  --bg-surface-elevated: #f4edfb;
+  --bg-surface-hover: #eae0f6;
+  --border-subtle: rgba(147, 51, 234, 0.12);
+  --border-accent: rgba(168, 85, 247, 0.35);
+  --border-glow: rgba(168, 85, 247, 0.25);
 
-  --text-primary: #1c130c;
-  --text-secondary: #5c4a3d;
-  --text-muted: #9c8a7d;
-  --text-inverse: #fffdfa;
+  --text-primary: #190e2b;
+  --text-secondary: #583e78;
+  --text-muted: #8b74a3;
+  --text-inverse: #faf5ff;
 
-  --primary: #ea580c;
-  --primary-hover: #c2410c;
-  --primary-glow: rgba(234, 88, 12, 0.25);
+  --primary: #9333ea;
+  --primary-hover: #7e22ce;
+  --primary-glow: rgba(147, 51, 234, 0.25);
 
-  --secondary: #d97706;
-  --secondary-glow: rgba(217, 119, 6, 0.25);
+  --secondary: #6366f1;
+  --secondary-glow: rgba(99, 102, 241, 0.25);
 
-  --accent-gold: #b45309;
-  --accent-ruby: #be123c;
+  --accent-purple-light: #7c3aed;
+  --accent-cyan: #0284c7;
+  --accent-pink: #db2777;
   --accent-emerald: #059669;
 
-  --gradient-aurora: linear-gradient(135deg, #ea580c 0%, #f97316 35%, #d97706 70%, #ca8a04 100%);
-  --gradient-cta: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #d97706 100%);
-  --gradient-hero: linear-gradient(135deg, #9a3412 0%, #ea580c 40%, #ca8a04 100%);
+  --gradient-aurora: linear-gradient(135deg, #9333ea 0%, #a855f7 35%, #6366f1 70%, #0284c7 100%);
+  --gradient-cta: linear-gradient(135deg, #9333ea 0%, #a855f7 50%, #7c3aed 100%);
+  --gradient-hero: linear-gradient(135deg, #3b0764 0%, #7e22ce 50%, #0284c7 100%);
 
   --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(180, 83, 9, 0.12);
-  --glass-shadow: 0 8px 32px rgba(234, 88, 12, 0.1);
+  --glass-border: rgba(147, 51, 234, 0.12);
+  --glass-shadow: 0 8px 32px rgba(147, 51, 234, 0.1);
 
-  --shadow-sm: 0 2px 8px rgba(28, 19, 12, 0.05);
-  --shadow-md: 0 8px 24px rgba(234, 88, 12, 0.09);
-  --shadow-lg: 0 16px 40px rgba(234, 88, 12, 0.14);
-  --shadow-glow: 0 0 30px rgba(234, 88, 12, 0.2);
+  --shadow-sm: 0 2px 8px rgba(25, 14, 43, 0.05);
+  --shadow-md: 0 8px 24px rgba(147, 51, 234, 0.09);
+  --shadow-lg: 0 16px 40px rgba(147, 51, 234, 0.14);
+  --shadow-glow: 0 0 30px rgba(147, 51, 234, 0.2);
 }
 
 /* Base Reset */
@@ -133,15 +134,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* App Background Gradient Glows - Royal Solar Flame Effect */
+/* App Background Gradient Glows - Luxe Light Purple & Celestial Glow */
 body::before {
   content: '';
   position: fixed;
   top: -180px;
   left: 10%;
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(255, 77, 0, 0.3) 0%, rgba(245, 158, 11, 0.14) 40%, transparent 70%);
+  width: 680px;
+  height: 680px;
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.3) 0%, rgba(168, 85, 247, 0.14) 40%, transparent 70%);
   filter: blur(100px);
   z-index: -1;
   pointer-events: none;
@@ -153,9 +154,9 @@ body::after {
   position: fixed;
   bottom: -160px;
   right: 5%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, rgba(225, 29, 72, 0.12) 45%, transparent 70%);
+  width: 620px;
+  height: 620px;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.25) 0%, rgba(56, 189, 248, 0.12) 45%, transparent 70%);
   filter: blur(110px);
   z-index: -1;
   pointer-events: none;
@@ -204,7 +205,7 @@ body::after {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 107, 43, 0.6) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(192, 132, 252, 0.6) 50%, transparent 100%);
   pointer-events: none;
 }
 
@@ -237,7 +238,7 @@ body::after {
   justify-content: center;
   overflow: hidden;
   box-shadow: 0 4px 18px var(--primary-glow);
-  border: 1px solid rgba(255, 215, 0, 0.25);
+  border: 1px solid rgba(192, 132, 252, 0.35);
   padding: 2px;
   flex-shrink: 0;
   transition: all var(--transition-bounce);
@@ -245,7 +246,7 @@ body::after {
 
 .brand-logo:hover .brand-logo-badge {
   transform: scale(1.08) rotate(-2deg);
-  box-shadow: 0 8px 24px var(--primary-glow), 0 0 20px var(--accent-gold-glow);
+  box-shadow: 0 8px 24px var(--primary-glow), 0 0 20px rgba(192, 132, 252, 0.5);
 }
 
 .brand-logo-img {
@@ -257,9 +258,9 @@ body::after {
 }
 
 [data-theme="dark"] .brand-logo-badge {
-  background: #140e0a;
-  border-color: rgba(255, 107, 43, 0.5);
-  box-shadow: 0 0 22px rgba(255, 107, 43, 0.45);
+  background: #140f26;
+  border-color: rgba(192, 132, 252, 0.5);
+  box-shadow: 0 0 22px rgba(192, 132, 252, 0.45);
 }
 
 [data-theme="dark"] .brand-logo-img {
@@ -276,14 +277,14 @@ body::after {
 }
 
 [data-theme="dark"] .brand-title-text {
-  background: linear-gradient(135deg, #ffffff 10%, #fde047 45%, #ff7300 80%, #ef4444 100%);
+  background: linear-gradient(135deg, #ffffff 15%, #e9d5ff 45%, #c084fc 75%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 16px rgba(255, 107, 43, 0.4));
+  filter: drop-shadow(0 0 16px rgba(192, 132, 252, 0.45));
 }
 
 [data-theme="light"] .brand-title-text {
-  background: linear-gradient(135deg, #1c130c 0%, #ea580c 60%, #ca8a04 100%);
+  background: linear-gradient(135deg, #190e2b 0%, #7c3aed 60%, #9333ea 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -291,20 +292,20 @@ body::after {
 .brand-badge {
   font-size: 0.68rem;
   font-weight: 800;
-  background: linear-gradient(135deg, rgba(255, 107, 43, 0.2), rgba(245, 158, 11, 0.2));
-  color: #ffd700;
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(168, 85, 247, 0.2));
+  color: #e9d5ff;
   padding: 3px 10px;
   border-radius: var(--radius-full);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 1px solid rgba(255, 107, 43, 0.4);
-  box-shadow: 0 0 14px rgba(255, 107, 43, 0.25);
+  border: 1px solid rgba(192, 132, 252, 0.45);
+  box-shadow: 0 0 14px rgba(192, 132, 252, 0.3);
 }
 
 [data-theme="light"] .brand-badge {
-  color: #c2410c;
-  background: rgba(234, 88, 12, 0.1);
-  border-color: rgba(234, 88, 12, 0.3);
+  color: #7e22ce;
+  background: rgba(147, 51, 234, 0.1);
+  border-color: rgba(147, 51, 234, 0.3);
 }
 
 .main-nav {
@@ -315,7 +316,7 @@ body::after {
   padding: 5px 6px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-subtle);
-  box-shadow: inset 0 1px 0 rgba(255, 215, 0, 0.08), var(--shadow-sm);
+  box-shadow: inset 0 1px 0 rgba(192, 132, 252, 0.1), var(--shadow-sm);
 }
 
 .nav-item {
@@ -393,7 +394,7 @@ body::after {
 
 .btn-post-job:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px var(--primary-glow), 0 0 22px var(--accent-gold-glow);
+  box-shadow: 0 8px 26px var(--primary-glow), 0 0 22px rgba(192, 132, 252, 0.5);
   filter: brightness(1.08);
 }
 
@@ -418,19 +419,19 @@ body:not([data-active-view="jobs"]) .hero-banner {
   gap: 8px;
   padding: 7px 18px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, rgba(255, 107, 43, 0.18), rgba(255, 215, 0, 0.18));
-  border: 1px solid rgba(255, 107, 43, 0.4);
-  color: #ffd700;
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(168, 85, 247, 0.18));
+  border: 1px solid rgba(192, 132, 252, 0.45);
+  color: #e9d5ff;
   font-size: 0.88rem;
   font-weight: 800;
   margin-bottom: 20px;
-  box-shadow: 0 0 22px rgba(255, 107, 43, 0.25);
+  box-shadow: 0 0 22px rgba(192, 132, 252, 0.3);
 }
 
 [data-theme="light"] .hero-pill {
-  color: #c2410c;
-  background: rgba(234, 88, 12, 0.08);
-  border-color: rgba(234, 88, 12, 0.28);
+  color: #7e22ce;
+  background: rgba(147, 51, 234, 0.08);
+  border-color: rgba(147, 51, 234, 0.28);
 }
 
 .hero-title {
@@ -445,7 +446,7 @@ body:not([data-active-view="jobs"]) .hero-banner {
   background: var(--gradient-hero);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 32px rgba(255, 107, 43, 0.45));
+  filter: drop-shadow(0 0 32px rgba(192, 132, 252, 0.45));
 }
 
 .hero-subtitle {
@@ -473,7 +474,7 @@ body:not([data-active-view="jobs"]) .hero-banner {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: inset 0 1px 0 rgba(255, 215, 0, 0.08), var(--shadow-sm);
+  box-shadow: inset 0 1px 0 rgba(192, 132, 252, 0.1), var(--shadow-sm);
   transition: all var(--transition-bounce);
   position: relative;
   overflow: hidden;
@@ -508,9 +509,9 @@ body:not([data-active-view="jobs"]) .hero-banner {
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  background: linear-gradient(135deg, rgba(255, 107, 43, 0.18), rgba(245, 158, 11, 0.18));
-  border: 1px solid rgba(255, 107, 43, 0.3);
-  box-shadow: 0 0 16px rgba(255, 107, 43, 0.2);
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(129, 140, 248, 0.18));
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  box-shadow: 0 0 16px rgba(192, 132, 252, 0.25);
   flex-shrink: 0;
 }
 
@@ -520,7 +521,7 @@ body:not([data-active-view="jobs"]) .hero-banner {
   color: var(--text-primary);
   line-height: 1.15;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+  text-shadow: 0 0 16px rgba(192, 132, 252, 0.35);
 }
 
 .stat-meta .stat-lbl {
@@ -780,7 +781,7 @@ body:not([data-active-view="jobs"]) .hero-banner {
 .btn-outline-primary {
   background: transparent;
   border-color: var(--border-accent);
-  color: #ffd700;
+  color: #c084fc;
 }
 .btn-outline-primary:hover {
   background: var(--gradient-cta);
