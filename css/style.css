@@ -401,9 +401,15 @@ body::after {
    Hero Banner Section
    ========================================================================== */
 .hero-banner {
-  padding: 50px 0 34px;
+  padding: 46px 0 30px;
   text-align: center;
   position: relative;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hero caption & banner only displayed on the main landing view after login */
+body:not([data-active-view="jobs"]) .hero-banner {
+  display: none !important;
 }
 
 .hero-pill {
@@ -529,12 +535,17 @@ body::after {
    ========================================================================== */
 .view-section {
   display: none;
+  padding-top: 32px;
   padding-bottom: 60px;
   animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .view-section.active {
   display: block;
+}
+
+#view-jobs {
+  padding-top: 0;
 }
 
 @keyframes fadeIn {

@@ -135,6 +135,13 @@ class App {
       sec.classList.toggle('active', sec.id === `view-${viewName}`);
     });
 
+    // Toggle hero banner: only displayed on the default landing section ('jobs') right after login
+    const heroBanner = document.getElementById('hero-banner');
+    if (heroBanner) {
+      heroBanner.style.display = (viewName === 'jobs') ? '' : 'none';
+    }
+    document.body.setAttribute('data-active-view', viewName);
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
