@@ -34,7 +34,19 @@ export const googleProvider = new GoogleAuthProvider();
 // Friendly error messages for common Firebase Auth error codes
 export function formatFirebaseError(error) {
   const code = error?.code || '';
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'your domain';
+
   switch (code) {
+    case 'auth/unauthorized-domain':
+      return `Domain not authorized: "${currentHost}" is not allowed in Firebase. Add it to Firebase Console > Authentication > Settings > Authorized domains.`;
+    case 'auth/popup-blocked':
+      return 'Sign-in popup was blocked by your browser. Please allow popups for this site.';
+    case 'auth/popup-closed-by-user':
+      return 'Google sign-in popup was closed before completing.';
+    case 'auth/cancelled-popup-request':
+      return 'Sign-in popup was cancelled.';
+    case 'auth/operation-not-allowed':
+      return 'Google Sign-In is disabled in Firebase. Enable it under Authentication > Sign-in method.';
     case 'auth/user-not-found':
     case 'auth/wrong-password':
     case 'auth/invalid-credential':
@@ -45,14 +57,12 @@ export function formatFirebaseError(error) {
       return 'Please provide a valid email address.';
     case 'auth/weak-password':
       return 'Password must be at least 6 characters.';
-    case 'auth/popup-closed-by-user':
-      return 'Sign in popup was closed before completing.';
     case 'auth/network-request-failed':
       return 'Network error. Please check your internet connection.';
     case 'auth/too-many-requests':
       return 'Access temporarily disabled due to many failed attempts. Try again later.';
     default:
-      return error.message || 'Authentication error. Please try again.';
+      return error?.message || 'Authentication error. Please try again.';
   }
 }
 
@@ -119,24 +129,31 @@ export async function firebaseSignUp(name, email, password, role = 'Candidate') 
  */
 export async function firebaseGoogleSignIn() {
   try {
+    console.log('[Firebase Auth] Opening Google Sign-In popup...');
     const result = await signInWithPopup(auth, googleProvider);
     const fbUser = result.user;
-    const name = fbUser.displayName || fbUser.email.split('@')[0];
-    const role = localStorage.getItem(`user_role_${fbUser.uid}`) || 'Candidate';
+    console.log('[Firebase Auth] Google Sign-In successful for:', fbUser.email);
 
+    // Map Firebase User to SK Hire User State
+    const role = localStorage.getItem(`user_role_${fbUser.uid}`) || 'Candidate';
     const user = {
       uid: fbUser.uid,
-      name: name,
+      name: fbUser.displayName || fbUser.email.split('@')[0],
       email: fbUser.email,
       role: role,
-      avatar: name.slice(0, 2).toUpperCase(),
-      joinedAt: fbUser.metadata.creationTime || new Date().toISOString()
+      avatar: (fbUser.displayName || fbUser.email).slice(0, 2).toUpperCase(),
+      joinedAt: fbUser.metadata?.creationTime || new Date().toISOString()
     };
 
     localStorage.setItem('hirecraft_auth_user', JSON.stringify(user));
     return { success: true, user };
   } catch (error) {
-    return { success: false, error: formatFirebaseError(error) };
+    console.error('[Firebase Auth] Google Sign-In Error:', error.code, error.message, error);
+    return { 
+      success: false, 
+      error: formatFirebaseError(error),
+      code: error?.code 
+    };
   }
 }
 

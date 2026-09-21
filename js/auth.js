@@ -446,9 +446,10 @@ class AuthController {
             window.location.href = 'index.html';
           }, 900);
         } else {
-          this.showToast(result.error, 'info');
+          this.showToast(result.error, 'error');
         }
       } catch (err) {
+        console.error('[Auth] Google Sign-In Exception:', err);
         this.showToast(err.message || 'Google Sign-In failed.', 'error');
       }
       return;
@@ -533,12 +534,13 @@ class AuthController {
 
     container.appendChild(toast);
 
+    const duration = type === 'error' ? 7000 : 3500;
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
-    }, 3500);
+    }, duration);
   }
 }
 
