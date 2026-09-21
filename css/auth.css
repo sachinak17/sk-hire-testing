@@ -45,7 +45,7 @@
 .ambient-orb-1 {
   width: 520px;
   height: 520px;
-  background: radial-gradient(circle, #8b5cf6, #6366f1);
+  background: radial-gradient(circle, #ff4500, #ff7a00);
   top: -140px;
   left: -120px;
   animation-duration: 20s;
@@ -54,7 +54,7 @@
 .ambient-orb-2 {
   width: 560px;
   height: 560px;
-  background: radial-gradient(circle, #06b6d4, #0891b2);
+  background: radial-gradient(circle, #ffd700, #f59e0b);
   bottom: -160px;
   right: -120px;
   animation-duration: 24s;
@@ -64,7 +64,7 @@
 .ambient-orb-3 {
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, #ec4899, #a855f7);
+  background: radial-gradient(circle, #e11d48, #ff3d00);
   top: 35%;
   left: 40%;
   animation-duration: 16s;
@@ -86,18 +86,18 @@
   display: grid;
   grid-template-columns: 1.05fr 1.2fr;
   background: var(--glass-bg);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 107, 43, 0.25);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg), 0 0 60px -10px rgba(139, 92, 246, 0.25);
+  box-shadow: var(--shadow-lg), 0 0 60px -10px rgba(255, 107, 43, 0.35);
   overflow: hidden;
   transition: all var(--transition-normal);
 }
 
 /* Left Brand & Showcase Panel */
 .auth-showcase-panel {
-  background: linear-gradient(155deg, rgba(14, 19, 36, 0.95) 0%, rgba(6, 8, 19, 0.98) 100%);
+  background: linear-gradient(155deg, rgba(22, 16, 12, 0.97) 0%, rgba(9, 7, 6, 0.99) 100%);
   padding: 48px 40px;
   display: flex;
   flex-direction: column;
@@ -108,7 +108,7 @@
 }
 
 [data-theme="light"] .auth-showcase-panel {
-  background: linear-gradient(155deg, #f0f4ff 0%, #e2e8f0 100%);
+  background: linear-gradient(155deg, #fff7ed 0%, #ffedd5 100%);
 }
 
 .auth-showcase-panel::before {
@@ -138,8 +138,8 @@
   height: 48px;
   border-radius: 12px;
   object-fit: cover;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
-  border: 2px solid var(--border-accent);
+  box-shadow: 0 4px 16px rgba(255, 107, 43, 0.4);
+  border: 2px solid rgba(255, 215, 0, 0.45);
 }
 
 .showcase-brand-text {
@@ -185,15 +185,15 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.15));
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: linear-gradient(135deg, rgba(255, 107, 43, 0.22), rgba(255, 215, 0, 0.16));
+  border: 1px solid rgba(255, 107, 43, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
   flex-shrink: 0;
-  color: #c084fc;
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.2);
+  color: #ffd700;
+  box-shadow: 0 0 16px rgba(255, 107, 43, 0.28);
 }
 
 .feature-info h4 {
@@ -212,13 +212,13 @@
 /* Live Social Proof Badge */
 .showcase-proof-card {
   background: var(--bg-surface-elevated);
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  border: 1px solid rgba(255, 107, 43, 0.35);
   border-radius: 18px;
   padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow-sm);
+  box-shadow: inset 0 1px 0 rgba(255, 215, 0, 0.12), var(--shadow-sm);
 }
 
 .proof-avatar-group {
@@ -620,8 +620,8 @@
 
 .role-pill-option input[type="radio"]:checked + .role-pill-label {
   border-color: var(--primary);
-  background: rgba(139, 92, 246, 0.16);
-  color: #c084fc;
+  background: rgba(255, 107, 43, 0.16);
+  color: #ffd700;
   box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
@@ -680,7 +680,7 @@
 }
 
 .auth-forgot-link {
-  color: #c084fc;
+  color: #ff944d;
   text-decoration: none;
   font-weight: 600;
   transition: color var(--transition-fast);
@@ -689,7 +689,7 @@
 
 .auth-forgot-link:hover {
   text-decoration: underline;
-  color: var(--secondary);
+  color: var(--accent-gold);
 }
 
 /* Primary Submit Button */
@@ -979,8 +979,8 @@
 /* Active Session Detected Banner */
 .already-logged-in-banner {
   display: none;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(99, 102, 241, 0.12));
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: linear-gradient(135deg, rgba(255, 107, 43, 0.15), rgba(255, 215, 0, 0.15));
+  border: 1px solid rgba(255, 107, 43, 0.4);
   border-radius: var(--radius-md);
   padding: 14px 16px;
   margin-bottom: 20px;
@@ -1029,7 +1029,7 @@
 .btn-session-continue {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--primary), #4338ca);
+  background: var(--gradient-cta);
   color: #fff;
   font-size: 0.82rem;
   font-weight: 700;
