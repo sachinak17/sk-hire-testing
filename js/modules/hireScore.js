@@ -146,9 +146,9 @@ export class HireScoreEngine {
     if (aptScore < 12) {
       recommendations.push({
         pillar: 'aptitude',
-        title: 'Complete Quantitative & Logical Aptitude Quizzes',
+        title: 'Complete Core CS & Technical Assessment Quizzes',
         impact: '+4 to 6 pts',
-        actionLabel: 'Take Aptitude Quiz',
+        actionLabel: 'Take Technical Quiz',
         view: 'prep'
       });
     }
@@ -220,13 +220,13 @@ export class HireScoreEngine {
           summary: `${solvedDsaIds.size}/${totalProblems} problems verified in blank workspace`
         },
         aptitude: {
-          name: 'Aptitude & Reasoning',
+          name: 'Core CS & Assessment Quizzes',
           score: aptScore,
           max: 15,
           percent: Math.round((aptScore / 15) * 100),
           quizCount: quizHistory.length,
           avgScore: aptAvg,
-          icon: '🧠',
+          icon: '💻',
           summary: quizHistory.length > 0 ? `${quizHistory.length} quizzes taken (Avg: ${aptAvg}%)` : 'No timed quizzes taken yet'
         },
         projects: {

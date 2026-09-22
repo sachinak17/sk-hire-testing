@@ -9,8 +9,8 @@ import { state } from '../state.js';
 export class PrepModule {
   constructor(app) {
     this.app = app;
-    this.activeTab = 'aptitude'; // 'aptitude' | 'technical' | 'hr'
-    this.activeSubcatId = 'quant';
+    this.activeTab = 'technical'; // 'technical' | 'hr'
+    this.activeSubcatId = 'os';
     this.currentQuiz = null;
     this.quizState = {
       questions: [],
@@ -29,7 +29,7 @@ export class PrepModule {
   }
 
   bindEvents() {
-    // Primary Tab buttons (Aptitude, Tech CS, HR)
+    // Primary Tab buttons (Tech CS, HR)
     const tabNav = document.getElementById('prep-tabs-nav');
     if (tabNav) {
       tabNav.addEventListener('click', (e) => {
@@ -40,8 +40,7 @@ export class PrepModule {
         this.activeTab = btn.dataset.tab;
         
         // Default subcat
-        if (this.activeTab === 'aptitude') this.activeSubcatId = 'quant';
-        else if (this.activeTab === 'technical') this.activeSubcatId = 'os';
+        if (this.activeTab === 'technical') this.activeSubcatId = 'os';
 
         this.render();
       });
@@ -63,8 +62,8 @@ export class PrepModule {
     const container = document.getElementById('prep-content-container');
     if (!container) return;
 
-    if (this.activeTab === 'aptitude' || this.activeTab === 'technical') {
-      this.renderStudyAndQuizHub(container, PREP_DATA[this.activeTab]);
+    if (this.activeTab === 'technical') {
+      this.renderStudyAndQuizHub(container, PREP_DATA.technical);
     } else if (this.activeTab === 'hr') {
       this.renderHrHub(container, PREP_DATA.hr);
     }

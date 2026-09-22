@@ -170,7 +170,7 @@ export class DashboardModule {
             Comprehensive Candidate Hire Score
           </h2>
           <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px;">
-            A verified 360° benchmark evaluated across <strong>Skills, DSA Sheet, Aptitude, Projects, ATS Resume</strong>, and <strong>Behavioral Interviews</strong>. Used by tech recruiters to shortlist candidates.
+            A verified 360° benchmark evaluated across <strong>Skills, DSA Sheet, Core CS Quizzes, Projects, ATS Resume</strong>, and <strong>Behavioral Interviews</strong>. Used by tech recruiters to shortlist candidates.
           </p>
 
           <div class="hire-meta-grid">
@@ -312,12 +312,12 @@ export class DashboardModule {
           </div>
 
           <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 12px 0 16px;">
-            Timed assessments covering Quantitative Math, Logical Deduction, Verbal Ability, and Core CS.
+            Timed assessments covering Operating Systems, Database Management, Networks, and Core CS.
           </p>
 
           <div class="pillar-footer-action">
             <button class="btn btn-secondary btn-full" onclick="window.SKHireApp ? window.SKHireApp.switchView('prep') : window.HireCraftApp.switchView('prep')">
-              🧠 Take Aptitude Assessment
+              💻 Practice Core CS Quizzes
             </button>
           </div>
         </div>
