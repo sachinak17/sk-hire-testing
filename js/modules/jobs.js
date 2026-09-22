@@ -1,6 +1,6 @@
 /**
- * HireCraft - Job Portal Module
- * Renders job listings, filters, details modal, easy apply flow, and post a job simulator.
+ * HireCraft - Job Listings & Applications Module
+ * Renders job listings, filters, details modal, and easy apply flow.
  */
 
 import { INITIAL_JOBS } from '../data/jobsData.js';
@@ -68,12 +68,6 @@ export class JobsModule {
       });
     }
 
-    // Post Job Button
-    const postJobBtn = document.getElementById('btn-open-post-job');
-    if (postJobBtn) {
-      postJobBtn.addEventListener('click', () => this.openPostJobModal());
-    }
-
     // Modal close listeners
     const modalCloseButtons = document.querySelectorAll('[data-close-modal]');
     modalCloseButtons.forEach(btn => {
@@ -87,11 +81,6 @@ export class JobsModule {
     const applyForm = document.getElementById('easy-apply-form');
     if (applyForm) {
       applyForm.addEventListener('submit', (e) => this.handleApplySubmit(e));
-    }
-
-    const postJobForm = document.getElementById('post-job-form');
-    if (postJobForm) {
-      postJobForm.addEventListener('submit', (e) => this.handlePostJobSubmit(e));
     }
 
     // Subscribe to state changes
@@ -369,67 +358,6 @@ export class JobsModule {
 
     this.closeModal('easy-apply-modal');
     this.app.showToast(`Application successfully sent to ${job.company}!`, 'success');
-    this.render();
-  }
-
-  openPostJobModal() {
-    const modal = document.getElementById('post-job-modal');
-    if (modal) modal.classList.add('active');
-  }
-
-  handlePostJobSubmit(e) {
-    e.preventDefault();
-    const title = document.getElementById('post-title').value.trim();
-    const company = document.getElementById('post-company').value.trim();
-    const location = document.getElementById('post-location').value.trim();
-    const workplaceType = document.getElementById('post-workplace').value;
-    const type = document.getElementById('post-type').value;
-    const experienceLevel = document.getElementById('post-exp').value;
-    const category = document.getElementById('post-category').value;
-    const salary = document.getElementById('post-salary').value.trim();
-    const tags = document.getElementById('post-tags').value.split(',').map(t => t.trim()).filter(Boolean);
-    const overview = document.getElementById('post-overview').value.trim();
-
-    const newJob = {
-      id: 'custom_' + Date.now(),
-      title,
-      company,
-      logo: '🚀',
-      location,
-      workplaceType,
-      type,
-      experience: experienceLevel === 'fresher' ? 'Fresher (0-1 yr)' : experienceLevel === 'junior' ? '1-3 years' : '3+ years',
-      experienceLevel,
-      domain: category.toUpperCase(),
-      category,
-      salary: salary || 'Competitive Industry Standard',
-      postedAt: 'Just now',
-      deadline: '2026-12-31',
-      applicantsCount: 1,
-      rating: 4.8,
-      tags: tags.length ? tags : ['Fullstack', 'Problem Solving', 'Engineering'],
-      overview: overview || 'Fast-growing team looking for passionate software engineers to scale systems and build great user experiences.',
-      responsibilities: [
-        'Collaborate with cross-functional teams to design, code, and deploy features.',
-        'Write resilient, maintainable, and well-tested code.',
-        'Participate in agile sprints and peer code reviews.'
-      ],
-      requirements: [
-        'Strong programming fundamentals and data structures knowledge.',
-        'Familiarity with modern web stacks, APIs, and databases.',
-        'Excellent teamwork and communication skills.'
-      ],
-      perks: [
-        'Flexible working hours & remote options.',
-        'Competitive equity / performance bonuses.',
-        'Learning and wellness stipends.'
-      ]
-    };
-
-    state.addCustomJob(newJob);
-    this.closeModal('post-job-modal');
-    this.app.showToast(`Job listing "${title}" posted successfully!`, 'success');
-    e.target.reset();
     this.render();
   }
 

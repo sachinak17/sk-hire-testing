@@ -95,6 +95,8 @@ class App {
       });
     }
 
+
+
     // Close any open modal on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -265,6 +267,8 @@ class App {
       `;
     }
   }
+
+
 }
 
 // Instantiate and start app on DOM content loaded

@@ -3,6 +3,8 @@
  * Handles local storage persistence, bookmarks, applied jobs, DSA progress, and user notes.
  */
 
+import { HireScoreEngine } from './modules/hireScore.js';
+
 const STORAGE_KEYS = {
   THEME: 'hirecraft_theme',
   SAVED_JOBS: 'hirecraft_saved_jobs',
@@ -12,7 +14,58 @@ const STORAGE_KEYS = {
   DSA_NOTES: 'hirecraft_dsa_notes',
   QUIZ_HISTORY: 'hirecraft_quiz_history',
   CUSTOM_JOBS: 'hirecraft_custom_jobs',
-  AUTH_USER: 'hirecraft_auth_user'
+  AUTH_USER: 'hirecraft_auth_user',
+  STUDENT_SKILLS: 'hirecraft_student_skills',
+  STUDENT_PROJECTS: 'hirecraft_student_projects',
+  RESUME_PROFILE: 'hirecraft_resume_profile',
+  INTERVIEW_PROFILE: 'hirecraft_interview_profile'
+};
+
+const DEFAULT_SKILLS = [
+  'JavaScript', 'React', 'Node.js', 'Python', 'SQL & PostgreSQL', 'Data Structures & Algorithms', 'Git & GitHub'
+];
+
+const DEFAULT_PROJECTS = [
+  {
+    id: 'proj_1',
+    title: 'DevSphere - Real-time Collaborative Code Editor',
+    description: 'Web-based multi-user IDE featuring collaborative editing via WebSockets, syntax highlighting, and isolated code execution sandboxes.',
+    techStack: ['React', 'Node.js', 'WebSockets', 'Tailwind', 'Docker'],
+    githubUrl: 'https://github.com/developer/devsphere',
+    liveUrl: 'https://devsphere-demo.vercel.app'
+  },
+  {
+    id: 'proj_2',
+    title: 'HireMatrix - AI Placement & Job Matcher',
+    description: 'Career intelligence portal parsing student resumes, scoring ATS compliance, and delivering role recommendations with interview prep pipelines.',
+    techStack: ['JavaScript', 'Python', 'FastAPI', 'PostgreSQL', 'CSS3'],
+    githubUrl: 'https://github.com/developer/hirematrix',
+    liveUrl: 'https://hirematrix-app.net'
+  }
+];
+
+const DEFAULT_RESUME = {
+  fileName: 'Sachin_AK_Software_Engineer_Resume.pdf',
+  targetRole: 'Software Development Engineer (SDE-1)',
+  atsScore: 84,
+  lastAudited: new Date().toISOString(),
+  highlights: 'High compatibility match for Software Engineering roles (14 matched keywords, 4 impact metrics).'
+};
+
+const DEFAULT_INTERVIEW = {
+  starStories: [
+    {
+      id: 'star_1',
+      title: 'Overcoming tight sprint deadline for microservice migration',
+      text: 'During our campus capstone project, our microservice faced latency spikes. I took charge of profiling database queries, introducing Redis caching. Result: response times reduced by 42%.'
+    },
+    {
+      id: 'star_2',
+      title: 'Resolving team conflict on architectural decision',
+      text: 'When choosing between SQL and NoSQL for a student portal, our team was divided. I prepared an objective benchmark matrix and presented the trade-offs, aligning the team.'
+    }
+  ],
+  hrPracticed: ['hr_1', 'hr_2', 'hr_3', 'hr_4']
 };
 
 class StateManager {
@@ -26,6 +79,13 @@ class StateManager {
     this.quizHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUIZ_HISTORY) || '[]');
     this.customJobs = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_JOBS) || '[]');
     this.currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.AUTH_USER) || 'null');
+    
+    // Hire Score Components State
+    this.studentSkills = JSON.parse(localStorage.getItem(STORAGE_KEYS.STUDENT_SKILLS) || JSON.stringify(DEFAULT_SKILLS));
+    this.studentProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.STUDENT_PROJECTS) || JSON.stringify(DEFAULT_PROJECTS));
+    this.resumeProfile = JSON.parse(localStorage.getItem(STORAGE_KEYS.RESUME_PROFILE) || JSON.stringify(DEFAULT_RESUME));
+    this.interviewProfile = JSON.parse(localStorage.getItem(STORAGE_KEYS.INTERVIEW_PROFILE) || JSON.stringify(DEFAULT_INTERVIEW));
+    
     this.listeners = [];
   }
 
@@ -167,6 +227,70 @@ class StateManager {
   }
 
   // Authentication
+  // =========================================================================
+  // HIRE SCORE & CANDIDATE PROFILE SYSTEM
+  // =========================================================================
+  getHireScore() {
+    return HireScoreEngine.calculate(this);
+  }
+
+  updateSkills(skillsList) {
+    this.studentSkills = [...skillsList];
+    localStorage.setItem(STORAGE_KEYS.STUDENT_SKILLS, JSON.stringify(this.studentSkills));
+    this.notify('hire_score_updated', this.getHireScore());
+  }
+
+  addProject(project) {
+    const newProj = {
+      ...project,
+      id: 'proj_' + Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    this.studentProjects.unshift(newProj);
+    localStorage.setItem(STORAGE_KEYS.STUDENT_PROJECTS, JSON.stringify(this.studentProjects));
+    this.notify('hire_score_updated', this.getHireScore());
+    return newProj;
+  }
+
+  deleteProject(projectId) {
+    this.studentProjects = this.studentProjects.filter(p => p.id !== projectId);
+    localStorage.setItem(STORAGE_KEYS.STUDENT_PROJECTS, JSON.stringify(this.studentProjects));
+    this.notify('hire_score_updated', this.getHireScore());
+  }
+
+  updateResumeProfile(resumeData) {
+    this.resumeProfile = {
+      ...this.resumeProfile,
+      ...resumeData,
+      lastAudited: new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEYS.RESUME_PROFILE, JSON.stringify(this.resumeProfile));
+    this.notify('hire_score_updated', this.getHireScore());
+  }
+
+  recordStarStory(story) {
+    const newStory = {
+      ...story,
+      id: 'star_' + Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    if (!this.interviewProfile.starStories) this.interviewProfile.starStories = [];
+    this.interviewProfile.starStories.unshift(newStory);
+    localStorage.setItem(STORAGE_KEYS.INTERVIEW_PROFILE, JSON.stringify(this.interviewProfile));
+    this.notify('hire_score_updated', this.getHireScore());
+    return newStory;
+  }
+
+  toggleHrPracticed(questionId) {
+    if (!this.interviewProfile.hrPracticed) this.interviewProfile.hrPracticed = [];
+    const set = new Set(this.interviewProfile.hrPracticed);
+    if (set.has(questionId)) set.delete(questionId);
+    else set.add(questionId);
+    this.interviewProfile.hrPracticed = [...set];
+    localStorage.setItem(STORAGE_KEYS.INTERVIEW_PROFILE, JSON.stringify(this.interviewProfile));
+    this.notify('hire_score_updated', this.getHireScore());
+  }
+
   getCurrentUser() {
     return this.currentUser;
   }
@@ -201,6 +325,11 @@ class StateManager {
     localStorage.removeItem(STORAGE_KEYS.QUIZ_HISTORY);
     localStorage.removeItem(STORAGE_KEYS.CUSTOM_JOBS);
 
+    localStorage.removeItem(STORAGE_KEYS.STUDENT_SKILLS);
+    localStorage.removeItem(STORAGE_KEYS.STUDENT_PROJECTS);
+    localStorage.removeItem(STORAGE_KEYS.RESUME_PROFILE);
+    localStorage.removeItem(STORAGE_KEYS.INTERVIEW_PROFILE);
+
     this.savedJobIds.clear();
     this.applications = [];
     this.solvedDsaIds.clear();
@@ -208,8 +337,13 @@ class StateManager {
     this.dsaNotes = {};
     this.quizHistory = [];
     this.customJobs = [];
+    this.studentSkills = [...DEFAULT_SKILLS];
+    this.studentProjects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+    this.resumeProfile = JSON.parse(JSON.stringify(DEFAULT_RESUME));
+    this.interviewProfile = JSON.parse(JSON.stringify(DEFAULT_INTERVIEW));
 
     this.notify('state_reset', null);
+    this.notify('hire_score_updated', this.getHireScore());
   }
 }
 

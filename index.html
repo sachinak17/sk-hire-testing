@@ -49,14 +49,12 @@
           <button class="nav-item" data-view="prep">💡 Prep Hub</button>
           <button class="nav-item" data-view="companies">🏢 Companies</button>
           <button class="nav-item" data-view="dsa">⚡ DSA Sheet</button>
-          <button class="nav-item" data-view="dashboard">📊 Dashboard</button>
+          <button class="nav-item" data-view="dashboard">🎯 Hire Score</button>
         </nav>
 
         <div class="nav-actions">
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Dark/Light Mode">☀️</button>
-          <button class="btn-post-job" id="btn-open-post-job">
-            <span>+</span> Post a Job
-          </button>
+
           <div id="nav-auth-container">
             <a href="login.html" class="btn-nav-signin" id="btn-nav-login">
               <span>👤</span> Sign In
@@ -277,8 +275,8 @@
     <section id="view-dashboard" class="view-section">
       <div class="section-header-row">
         <div class="section-heading-group">
-          <h2>📊 Candidate Readiness Dashboard</h2>
-          <p>Track your interview preparedness, review bookmarked roles, and monitor submitted applications.</p>
+          <h2>🎯 Student Hire Score & Readiness Hub</h2>
+          <p>Multi-dimensional hiring readiness index based on your Skills, DSA, Aptitude, Projects, Resume, and Interview preparation.</p>
         </div>
       </div>
 
@@ -366,89 +364,153 @@
     </div>
   </div>
 
-  <!-- 3. Post a Job Modal -->
-  <div class="modal-overlay" id="post-job-modal">
-    <div class="modal-card" style="max-width: 650px;">
+  <!-- 3A. Manage Skills Modal -->
+  <div class="modal-overlay" id="skills-modal">
+    <div class="modal-card" style="max-width: 680px;">
       <div class="modal-header">
-        <h3>Post a Tech Job Opening</h3>
-        <button class="modal-close-btn" data-close-modal="post-job-modal">✕</button>
-      </div>
-      <form id="post-job-form">
-        <div class="modal-body">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Job Title *</label>
-              <input type="text" id="post-title" class="search-input" style="padding: 10px;" placeholder="e.g. Backend Engineer" required />
-            </div>
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Company Name *</label>
-              <input type="text" id="post-company" class="search-input" style="padding: 10px;" placeholder="e.g. Acme Tech Corp" required />
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Location *</label>
-              <input type="text" id="post-location" class="search-input" style="padding: 10px;" placeholder="Bangalore, India" required />
-            </div>
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Workplace Type</label>
-              <select id="post-workplace" class="filter-select" style="width: 100%; padding: 10px; margin-top: 2px;">
-                <option value="Hybrid">Hybrid</option>
-                <option value="Remote">Remote</option>
-                <option value="On-site">On-site</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Job Type</label>
-              <select id="post-type" class="filter-select" style="width: 100%; padding: 10px; margin-top: 2px;">
-                <option value="Full-time">Full-time</option>
-                <option value="Internship">Internship</option>
-              </select>
-            </div>
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Experience</label>
-              <select id="post-exp" class="filter-select" style="width: 100%; padding: 10px; margin-top: 2px;">
-                <option value="fresher">Fresher (0-1 yr)</option>
-                <option value="junior">Junior (1-3 yrs)</option>
-                <option value="mid">Mid-Senior (3+ yrs)</option>
-              </select>
-            </div>
-            <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Domain</label>
-              <select id="post-category" class="filter-select" style="width: 100%; padding: 10px; margin-top: 2px;">
-                <option value="sde">Software Engineering</option>
-                <option value="frontend">Frontend</option>
-                <option value="backend">Backend</option>
-                <option value="data">Data & AI</option>
-                <option value="devops">DevOps</option>
-                <option value="qa">Testing & QA</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 14px;">
-            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Salary / Stipend Range</label>
-            <input type="text" id="post-salary" class="search-input" style="padding: 10px;" placeholder="e.g. ₹12,00,000 - ₹18,00,000 / yr" />
-          </div>
-
-          <div style="margin-bottom: 14px;">
-            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Required Skills (Comma separated)</label>
-            <input type="text" id="post-tags" class="search-input" style="padding: 10px;" placeholder="React, Node.js, TypeScript, PostgreSQL" />
-          </div>
-
-          <div style="margin-bottom: 14px;">
-            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Job Overview & Mission</label>
-            <textarea id="post-overview" class="search-input" rows="3" style="padding: 10px;" placeholder="Brief description of the role and technical challenges..."></textarea>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">🛠️</span>
+          <div>
+            <h3 style="font-size: 1.2rem; font-weight: 800;">Manage Technical Skills</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Select the technologies in your verified stack to boost your Hire Score.</p>
           </div>
         </div>
+        <button class="modal-close-btn" data-close-modal="skills-modal">✕</button>
+      </div>
+      <form id="skills-form">
+        <div class="modal-body" style="max-height: 440px; overflow-y: auto;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="skills-checkboxes-container">
+            <!-- Dynamic skills list rendered by dashboard.js -->
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Max 15 pts based on verified skills</span>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" data-close-modal="skills-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-skills">Save Skills & Recalculate</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close-modal="post-job-modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Publish Job Listing</button>
+  <!-- 3B. Add Project Modal -->
+  <div class="modal-overlay" id="project-modal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">🚀</span>
+          <div>
+            <h3 style="font-size: 1.2rem; font-weight: 800;">Add Real-World Project</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Showcase verifiable systems with GitHub code and live demos.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="project-modal">✕</button>
+      </div>
+      <form id="project-form">
+        <div class="modal-body">
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Project Title *</label>
+            <input type="text" id="project-title" class="search-input" style="padding: 10px;" placeholder="e.g. Distributed Task Queue & Rate Limiter" required />
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Project Overview & Mission *</label>
+            <textarea id="project-desc" class="search-input" rows="3" style="padding: 10px;" placeholder="What does this system do? What core problems does it solve?" required></textarea>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Tech Stack (Comma-separated) *</label>
+            <input type="text" id="project-tech" class="search-input" style="padding: 10px;" placeholder="e.g. React, Node.js, Redis, Docker, PostgreSQL" required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div>
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">GitHub Repository URL</label>
+              <input type="url" id="project-github" class="search-input" style="padding: 10px;" placeholder="https://github.com/username/project" />
+            </div>
+            <div>
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Live Demo URL</label>
+              <input type="url" id="project-live" class="search-input" style="padding: 10px;" placeholder="https://my-app.vercel.app" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.82rem; color: var(--accent-emerald);">+3.5 to 5.0 pts per verified project</span>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" data-close-modal="project-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save to Portfolio</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3C. ATS Resume Analyzer Modal -->
+  <div class="modal-overlay" id="resume-modal">
+    <div class="modal-card" style="max-width: 720px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">📄</span>
+          <div>
+            <h3 style="font-size: 1.2rem; font-weight: 800;">ATS Resume Audit & Scorecard</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Scan your resume for recruiter ATS keywords, impact metrics, and contact integrity.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="resume-modal">✕</button>
+      </div>
+      <form id="resume-audit-form">
+        <div class="modal-body" style="max-height: 480px; overflow-y: auto;">
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Target Engineering Role</label>
+              <input type="text" id="resume-target-role" class="search-input" style="padding: 10px;" value="Software Development Engineer (SDE-1)" />
+            </div>
+            <div>
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Resume File / Title</label>
+              <input type="text" id="resume-filename" class="search-input" style="padding: 10px;" value="Sachin_AK_Resume.pdf" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Paste Resume Text (or Summary of Skills, Projects & Experience)</label>
+            <textarea id="resume-paste-text" class="search-input" rows="6" style="padding: 12px; font-size: 0.85rem;" placeholder="Paste resume content here to run instant automated ATS analysis (detects keywords, metrics, github, linkedin, contact info)...">Sachin A K
+Email: sachin@candidate.com | Phone: +91 9876543210 | GitHub: https://github.com/sachinak | LinkedIn: https://linkedin.com/in/sachinak
+Target Role: Software Development Engineer
+
+TECHNICAL SKILLS:
+- Languages: JavaScript, Python, C++, TypeScript, SQL
+- Frameworks: React, Node.js, Express, Tailwind CSS
+- Databases & Tools: PostgreSQL, MongoDB, Redis, Docker, Git, RESTful APIs, Linux
+
+PROJECTS:
+- DevSphere: Developed real-time collaborative code editor serving 1,200+ users. Reduced latency by 35% using WebSocket connections.
+- HireMatrix: Architected job placement platform with ATS scanner, optimizing candidate shortlisting by 45%. Implemented robust authentication with bcrypt and JWT.</textarea>
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-full" id="btn-run-resume-audit" style="font-weight: 700; margin-bottom: 16px;">
+            🔍 Scan & Calculate ATS Score
+          </button>
+
+          <!-- Audit Results Area -->
+          <div id="resume-audit-results" style="background: var(--bg-surface-elevated); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-weight: 800; font-size: 0.95rem;">ATS Audit Scorecard</span>
+              <span id="resume-ats-score-display" style="font-size: 1.4rem; font-weight: 900; color: var(--accent-emerald);">84%</span>
+            </div>
+            <div id="resume-feedback-list" style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+              <div style="color: var(--accent-emerald); font-weight: 600; margin-bottom: 4px;">✓ Verified Contacts: Email, Phone, GitHub, LinkedIn detected</div>
+              <div style="color: var(--primary); font-weight: 600; margin-bottom: 4px;">✓ Matched 14 Core Tech Keywords: React, Node, Python, SQL, Docker, APIs...</div>
+              <div style="color: var(--accent-amber); font-weight: 600;">✓ Quantifiable Impact Metrics detected (e.g. 1,200+ users, 35% latency reduction)</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.82rem; color: var(--accent-cyan);">Contributes up to 15 pts to your Hire Score</span>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" data-close-modal="resume-modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save to Profile & Recalculate</button>
+          </div>
         </div>
       </form>
     </div>
@@ -476,6 +538,106 @@
         <button class="modal-close-btn" data-close-modal="company-details-modal">✕</button>
       </div>
       <div class="modal-body" id="company-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 6A. Interactive DSA Problem Solver & Code Workspace Modal -->
+  <div class="modal-overlay" id="dsa-solve-modal">
+    <div class="modal-card" style="max-width: 980px; height: 90vh;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <h3 id="dsa-solve-title" style="display: flex; align-items: center; gap: 8px;">
+            <span>⚡ Solve Problem</span>
+          </h3>
+          <div id="dsa-solve-diff"></div>
+          <div id="dsa-solve-companies" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <a id="dsa-solve-external-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" title="Open in LeetCode">
+            LeetCode ↗
+          </a>
+          <button class="modal-close-btn" data-close-modal="dsa-solve-modal">✕</button>
+        </div>
+      </div>
+
+      <div class="modal-body dsa-solver-body" style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; padding: 22px; height: calc(100% - 140px); overflow: hidden;">
+        <!-- Left Panel: Problem Statement, Constraints & Sample Test Cases -->
+        <div class="dsa-solver-problem-panel" style="overflow-y: auto; padding-right: 10px;">
+          <div class="dsa-solver-section">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 8px;">📋 Problem Statement</h4>
+            <div id="dsa-solve-description" style="font-size: 0.88rem; color: var(--text-primary); line-height: 1.6;"></div>
+          </div>
+
+          <div class="dsa-solver-section" style="margin-top: 16px;">
+            <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">🎯 Target Function Signature</h4>
+            <pre id="dsa-solve-signature" style="background: var(--bg-surface-elevated); padding: 12px 14px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-cyan); border-left: 3px solid var(--primary); line-height: 1.5; margin: 0; white-space: pre-wrap;"></pre>
+          </div>
+
+          <div class="dsa-solver-section" style="margin-top: 16px;">
+            <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Target Complexity Bounds</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div style="background: var(--bg-surface-elevated); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Time Complexity</div>
+                <div id="dsa-solve-time" style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-emerald); font-size: 0.85rem;"></div>
+              </div>
+              <div style="background: var(--bg-surface-elevated); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Space Complexity</div>
+                <div id="dsa-solve-space" style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); font-size: 0.85rem;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dsa-solver-section" style="margin-top: 16px;">
+            <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Sample Test Cases & Constraints</h4>
+            <div id="dsa-solve-testcases" style="background: var(--bg-surface-elevated); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5;"></div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Code Workspace & Interactive Test Runner Console -->
+        <div class="dsa-solver-code-panel" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div class="code-lang-tabs" id="solver-lang-tabs" style="border: none; padding: 0; background: transparent;">
+              <button class="lang-tab-btn active" data-solver-lang="javascript">JavaScript (Live Test)</button>
+              <button class="lang-tab-btn" data-solver-lang="python">Python</button>
+              <button class="lang-tab-btn" data-solver-lang="java">Java</button>
+              <button class="lang-tab-btn" data-solver-lang="cpp">C++</button>
+            </div>
+            <button class="btn btn-secondary" id="btn-reset-solver-code" style="padding: 4px 10px; font-size: 0.75rem;" title="Clear editor to blank page">
+              🗑️ Clear Page
+            </button>
+          </div>
+
+          <!-- Code Editor Textarea (Clean Blank Workspace) -->
+          <div style="flex: 1; min-height: 200px; position: relative; margin-bottom: 12px;">
+            <textarea id="dsa-solver-code-editor" class="code-solver-textarea" spellcheck="false" placeholder="// Blank Code Workspace: Write your solution code here from scratch..."></textarea>
+          </div>
+
+          <!-- Console & Test Output Area -->
+          <div class="dsa-console-container">
+            <div class="dsa-console-header">
+              <span style="font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <span>💻</span> Execution Console & Test Output
+              </span>
+              <span id="dsa-console-status-pill" class="dsa-console-pill idle">Ready</span>
+            </div>
+            <div id="dsa-console-output" class="dsa-console-body">
+              Click "Run Test Cases" to test your solution or "Submit Solution" to complete the problem.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="dsa-solve-status-indicator" style="font-size: 0.88rem; font-weight: 700;"></div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-secondary" id="btn-run-dsa-tests">
+            ▶️ Run Test Cases
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-submit-dsa-solution">
+            🚀 Submit Solution & Mark as Solved
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 

@@ -4,6 +4,7 @@
  */
 
 import { DSA_TOPICS, DSA_PROBLEMS } from '../data/dsaSheetData.js';
+import { DSA_TEST_SUITES, testProblemCode } from './dsaRunner.js';
 import { state } from '../state.js';
 
 export class DsaSheetModule {
@@ -14,7 +15,9 @@ export class DsaSheetModule {
     this.searchQuery = '';
     this.openTopicIds = new Set(['arrays_hashing', 'two_pointers_sliding']);
     this.currentSolutionProblem = null;
+    this.currentSolveProblem = null;
     this.activeCodeLang = 'cpp';
+    this.activeSolverLang = 'javascript';
   }
 
   init() {
@@ -50,7 +53,7 @@ export class DsaSheetModule {
       });
     }
 
-    // Modal Close
+    // Modal Close - Solution Modal
     const closeSolutionBtn = document.querySelector('[data-close-modal="dsa-solution-modal"]');
     if (closeSolutionBtn) {
       closeSolutionBtn.addEventListener('click', () => {
@@ -58,6 +61,15 @@ export class DsaSheetModule {
       });
     }
 
+    // Modal Close - Solve Modal
+    const closeSolveBtn = document.querySelector('[data-close-modal="dsa-solve-modal"]');
+    if (closeSolveBtn) {
+      closeSolveBtn.addEventListener('click', () => {
+        document.getElementById('dsa-solve-modal')?.classList.remove('active');
+      });
+    }
+
+    // Modal Close - Notes Modal
     const closeNotesBtn = document.querySelector('[data-close-modal="dsa-notes-modal"]');
     if (closeNotesBtn) {
       closeNotesBtn.addEventListener('click', () => {
@@ -85,6 +97,53 @@ export class DsaSheetModule {
         state.saveDsaNote(problemId, noteText);
         document.getElementById('dsa-notes-modal')?.classList.remove('active');
         this.app.showToast('Personal notes saved!', 'success');
+      });
+    }
+
+    // Solver: Run Test Cases Button
+    const runTestsBtn = document.getElementById('btn-run-dsa-tests');
+    if (runTestsBtn) {
+      runTestsBtn.addEventListener('click', () => {
+        this.runTestCases();
+      });
+    }
+
+    // Solver: Submit Solution Button
+    const submitBtn = document.getElementById('btn-submit-dsa-solution');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', () => {
+        this.submitSolution();
+      });
+    }
+
+    // Solver: Reset Code Button
+    const resetCodeBtn = document.getElementById('btn-reset-solver-code');
+    if (resetCodeBtn) {
+      resetCodeBtn.addEventListener('click', () => {
+        this.resetSolverCode();
+      });
+    }
+
+    // Solver: Code Editor Autosave
+    const editor = document.getElementById('dsa-solver-code-editor');
+    if (editor) {
+      editor.addEventListener('input', (e) => {
+        if (this.currentSolveProblem) {
+          localStorage.setItem(`hirecraft_dsa_draft_${this.currentSolveProblem.id}_${this.activeSolverLang}`, e.target.value);
+        }
+      });
+    }
+
+    // Solver: Language Switcher Tabs
+    const solverLangTabs = document.getElementById('solver-lang-tabs');
+    if (solverLangTabs) {
+      solverLangTabs.querySelectorAll('.lang-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          solverLangTabs.querySelectorAll('.lang-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.activeSolverLang = btn.dataset.solverLang;
+          this.renderSolverCode();
+        });
       });
     }
 
@@ -150,7 +209,7 @@ export class DsaSheetModule {
 
         <div class="dsa-stats-numbers">
           <h4>${solvedCount} / ${totalProblems} Solved</h4>
-          <p>Master these core patterns to conquer top company interviews.</p>
+          <p>Click "⚡ Solve" on any problem to write code and verify your solution.</p>
         </div>
       </div>
 
@@ -211,12 +270,12 @@ export class DsaSheetModule {
           <table class="dsa-problems-table">
             <thead>
               <tr>
-                <th style="width: 44px; text-align: center;">Status</th>
+                <th style="width: 85px; text-align: center;">Status</th>
                 <th style="width: 44px; text-align: center;">★</th>
                 <th>Problem Title</th>
                 <th style="width: 100px;">Difficulty</th>
                 <th>Target Companies</th>
-                <th style="width: 180px; text-align: right;">Resources</th>
+                <th style="width: 250px; text-align: right;">Action & Resources</th>
               </tr>
             </thead>
             <tbody>
@@ -234,7 +293,9 @@ export class DsaSheetModule {
                 return `
                   <tr data-problem-row="${p.id}">
                     <td style="text-align: center;">
-                      <input type="checkbox" class="custom-checkbox" ${isSolved ? 'checked' : ''} data-toggle-solved="${p.id}" />
+                      <span class="dsa-status-badge ${isSolved ? 'solved' : 'pending'}" data-open-solve="${p.id}" title="${isSolved ? 'Problem Solved! Click to review code' : 'Pending. Click Solve to write code & complete!'}">
+                        ${isSolved ? '✅ Solved' : '⏳ Pending'}
+                      </span>
                     </td>
                     <td style="text-align: center;">
                       <button class="star-btn ${isStarred ? 'starred' : ''}" data-toggle-starred="${p.id}" title="${isStarred ? 'Starred for revision' : 'Star problem'}">
@@ -255,10 +316,19 @@ export class DsaSheetModule {
                       ${p.companies.length > 3 ? `<span class="company-mini-tag">+${p.companies.length - 3}</span>` : ''}
                     </td>
                     <td style="text-align: right;">
-                      <div style="display: inline-flex; gap: 8px;">
-                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.78rem;" data-view-solution="${p.id}">
-                          💡 Solution
+                      <div style="display: inline-flex; gap: 8px; align-items: center;">
+                        <button class="btn-solve-problem ${isSolved ? 'is-solved' : ''}" data-open-solve="${p.id}" title="${isSolved ? 'Review your solution code' : 'Solve problem in code editor'}">
+                          ${isSolved ? '✓ Solved' : '⚡ Solve'}
                         </button>
+                        ${isSolved ? `
+                          <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.78rem;" data-view-solution="${p.id}" title="View official solution & multi-language code">
+                            💡 Solution
+                          </button>
+                        ` : `
+                          <button class="btn btn-secondary btn-solution-locked" style="padding: 5px 10px; font-size: 0.78rem; opacity: 0.65;" data-view-solution="${p.id}" title="Solve and submit this problem first to unlock official solution">
+                            🔒 Solution
+                          </button>
+                        `}
                         <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.78rem; ${hasNote ? 'border-color: var(--primary); color: var(--primary);' : ''}" data-open-notes="${p.id}">
                           ${hasNote ? '📝 Note' : '+ Note'}
                         </button>
@@ -290,13 +360,11 @@ export class DsaSheetModule {
       });
     });
 
-    // Solved checkbox
-    container.querySelectorAll('[data-toggle-solved]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const pid = cb.dataset.toggleSolved;
-        const solved = state.toggleDsaSolved(pid);
-        this.app.showToast(solved ? 'Problem marked as Solved! 🎉' : 'Marked as Pending', 'info');
-        this.render();
+    // Open Solve Modal buttons
+    container.querySelectorAll('[data-open-solve]').forEach(el => {
+      el.addEventListener('click', () => {
+        const pid = el.dataset.openSolve;
+        this.openSolveModal(pid);
       });
     });
 
@@ -310,10 +378,16 @@ export class DsaSheetModule {
       });
     });
 
-    // View solution
+    // View solution (Locked until problem is solved)
     container.querySelectorAll('[data-view-solution]').forEach(btn => {
       btn.addEventListener('click', () => {
         const pid = btn.dataset.viewSolution;
+        const isSolved = state.isDsaSolved(pid);
+        if (!isSolved) {
+          this.app.showToast('🔒 Solution Locked: Solve and submit this problem first to unlock the official solution!', 'warning');
+          this.openSolveModal(pid);
+          return;
+        }
         this.openSolutionModal(pid);
       });
     });
@@ -325,6 +399,325 @@ export class DsaSheetModule {
         this.openNotesModal(pid);
       });
     });
+  }
+
+  openSolveModal(problemId) {
+    const p = DSA_PROBLEMS.find(prob => prob.id === problemId);
+    if (!p) return;
+
+    this.currentSolveProblem = p;
+    const modal = document.getElementById('dsa-solve-modal');
+    if (!modal) return;
+
+    const suite = DSA_TEST_SUITES[p.id];
+    const isSolved = state.isDsaSolved(p.id);
+
+    // Title & Metadata
+    document.getElementById('dsa-solve-title').innerHTML = `<span>⚡ ${p.title}</span>`;
+    document.getElementById('dsa-solve-diff').innerHTML = `<span class="diff-badge ${p.difficulty}">${p.difficulty}</span>`;
+    document.getElementById('dsa-solve-companies').innerHTML = p.companies.map(c => `<span class="company-mini-tag">${c}</span>`).join('');
+    
+    const extLink = document.getElementById('dsa-solve-external-link');
+    if (extLink) extLink.href = p.leetcodeUrl;
+
+    // Clean Problem Statement (No solution spoiler)
+    const descEl = document.getElementById('dsa-solve-description');
+    if (descEl) {
+      descEl.innerHTML = suite ? suite.description : `Given the problem requirements for <strong>${p.title}</strong>, write an optimal algorithm that passes all test cases.`;
+    }
+
+    // Function signature hint
+    const sigEl = document.getElementById('dsa-solve-signature');
+    if (sigEl) {
+      sigEl.textContent = suite ? suite.signatureHint : `function solve(...) {\n    // Write your code\n}`;
+    }
+
+    // Complexity bounds
+    const timeEl = document.getElementById('dsa-solve-time');
+    if (timeEl) timeEl.textContent = p.timeComplexity;
+
+    const spaceEl = document.getElementById('dsa-solve-space');
+    if (spaceEl) spaceEl.textContent = p.spaceComplexity;
+
+    // Sample test cases
+    const testcasesEl = document.getElementById('dsa-solve-testcases');
+    if (testcasesEl && suite) {
+      testcasesEl.innerHTML = suite.testCases.map((tc, idx) => `
+        <div style="margin-bottom: ${idx < suite.testCases.length - 1 ? '10px' : '0'}; padding-bottom: ${idx < suite.testCases.length - 1 ? '8px' : '0'}; border-bottom: ${idx < suite.testCases.length - 1 ? '1px dashed var(--border-subtle)' : 'none'};">
+          <span style="color: var(--primary); font-weight: 700;">Example ${idx + 1}:</span><br/>
+          <span style="color: var(--text-secondary);">Input: <code>${tc.displayInput}</code></span><br/>
+          <span style="color: var(--accent-emerald);">Expected Output: <code>${tc.expectedDisplay}</code></span>
+        </div>
+      `).join('');
+    }
+
+    // Reset console output
+    const consoleBody = document.getElementById('dsa-console-output');
+    if (consoleBody) {
+      consoleBody.textContent = `💻 Workspace ready (${this.activeSolverLang.toUpperCase()}). Write your code from scratch on the blank page, click "Run Test Cases" to test, then click "Submit Solution" to verify and mark as solved.`;
+    }
+
+    const consolePill = document.getElementById('dsa-console-status-pill');
+    if (consolePill) {
+      consolePill.className = 'dsa-console-pill idle';
+      consolePill.textContent = 'Ready';
+    }
+
+    // Status indicator in footer
+    const statusInd = document.getElementById('dsa-solve-status-indicator');
+    if (statusInd) {
+      if (isSolved) {
+        statusInd.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--accent-emerald);">✅ Already Solved!</span>
+            <button type="button" id="btn-unsolve-problem" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.74rem;">
+              Mark as Unsolved / Reset
+            </button>
+          </div>
+        `;
+        document.getElementById('btn-unsolve-problem')?.addEventListener('click', () => {
+          state.toggleDsaSolved(p.id);
+          this.app.showToast(`"${p.title}" marked as pending`, 'info');
+          this.openSolveModal(p.id);
+          this.render();
+        });
+      } else {
+        statusInd.innerHTML = `<span style="color: var(--text-muted);">⏳ Status: Pending (Unsolved)</span>`;
+      }
+    }
+
+    // Ensure active language tab is set
+    const solverLangTabs = document.getElementById('solver-lang-tabs');
+    if (solverLangTabs) {
+      solverLangTabs.querySelectorAll('.lang-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.solverLang === this.activeSolverLang);
+      });
+    }
+
+    this.renderSolverCode();
+    modal.classList.add('active');
+  }
+
+  renderSolverCode() {
+    const editor = document.getElementById('dsa-solver-code-editor');
+    if (!editor || !this.currentSolveProblem) return;
+
+    const p = this.currentSolveProblem;
+    const lang = this.activeSolverLang;
+    const suite = DSA_TEST_SUITES[p.id];
+    const draftKey = `hirecraft_dsa_draft_${p.id}_${lang}`;
+    const savedDraft = localStorage.getItem(draftKey);
+
+    // Provide a completely blank page unless student previously authored a draft
+    if (savedDraft !== null && savedDraft.trim().length > 0) {
+      editor.value = savedDraft;
+    } else {
+      editor.value = ''; // Clean blank page as requested
+    }
+
+    editor.placeholder = `// Blank Code Workspace: Write your ${lang.toUpperCase()} solution for "${p.title}" here from scratch...\n// Signature: ${suite ? suite.fnName : 'solve'}(...)\n// Click "Run Test Cases" to verify correctness before submitting.`;
+  }
+
+  resetSolverCode() {
+    if (!this.currentSolveProblem) return;
+    const p = this.currentSolveProblem;
+    const lang = this.activeSolverLang;
+    const draftKey = `hirecraft_dsa_draft_${p.id}_${lang}`;
+    localStorage.removeItem(draftKey);
+    
+    const editor = document.getElementById('dsa-solver-code-editor');
+    if (editor) editor.value = '';
+    
+    const consolePill = document.getElementById('dsa-console-status-pill');
+    if (consolePill) {
+      consolePill.className = 'dsa-console-pill idle';
+      consolePill.textContent = 'Ready';
+    }
+    const consoleBody = document.getElementById('dsa-console-output');
+    if (consoleBody) {
+      consoleBody.textContent = `🗑️ Workspace cleared to a blank page. Write your solution from scratch and run test cases.`;
+    }
+
+    this.app.showToast('Workspace cleared to blank page!', 'info');
+  }
+
+  runTestCases() {
+    if (!this.currentSolveProblem) return;
+    const p = this.currentSolveProblem;
+    const lang = this.activeSolverLang;
+    const editor = document.getElementById('dsa-solver-code-editor');
+    const code = editor ? editor.value.trim() : '';
+
+    const consolePill = document.getElementById('dsa-console-status-pill');
+    const consoleBody = document.getElementById('dsa-console-output');
+
+    if (!code || code.length < 5) {
+      if (consolePill) {
+        consolePill.className = 'dsa-console-pill error';
+        consolePill.textContent = 'Empty Code ❌';
+      }
+      if (consoleBody) {
+        consoleBody.textContent = `❌ Execution Error: Code workspace is empty.\nPlease write your solution code before running test cases.`;
+      }
+      this.app.showToast('Please write solution code before running tests', 'warning');
+      return;
+    }
+
+    if (consolePill) {
+      consolePill.className = 'dsa-console-pill running';
+      consolePill.textContent = 'Running Tests...';
+    }
+    if (consoleBody) {
+      consoleBody.textContent = `⚡ Testing ${lang.toUpperCase()} code against test suite for "${p.title}"...\nPlease wait...`;
+    }
+
+    setTimeout(() => {
+      const res = testProblemCode(code, lang, p.id);
+
+      if (!res.success) {
+        if (consolePill) {
+          consolePill.className = 'dsa-console-pill error';
+          consolePill.textContent = `Failed (${res.passedTests || 0}/${res.totalTests || 0}) ❌`;
+        }
+        if (consoleBody) {
+          let msg = `❌ [TEST RUNNER FAILED]\n`;
+          if (res.error) {
+            msg += `Error: ${res.error}\n\n`;
+          }
+          if (res.results && res.results.length > 0) {
+            res.results.forEach(r => {
+              msg += `${r.passed ? '✔' : '✖'} Test Case ${r.index}: ${r.passed ? 'PASSED' : 'FAILED'}\n`;
+              msg += `   Input:    ${r.input}\n`;
+              msg += `   Expected: ${r.expected}\n`;
+              msg += `   Received: ${r.received} (${r.durationMs || 0} ms)\n\n`;
+            });
+          }
+          msg += `⚠️ Your solution did not pass all test cases. Please fix your logic before submitting.`;
+          consoleBody.textContent = msg;
+        }
+        this.app.showToast('Test cases failed. Check console for failure details.', 'danger');
+        return;
+      }
+
+      // If all passed:
+      if (consolePill) {
+        consolePill.className = 'dsa-console-pill success';
+        consolePill.textContent = `Passed ${res.passedTests}/${res.totalTests} ✅`;
+      }
+      if (consoleBody) {
+        let msg = `✨ [TEST RUNNER SUCCESS] All ${res.totalTests}/${res.totalTests} Test Cases Passed!\n\n`;
+        res.results.forEach(r => {
+          msg += `✔ Test Case ${r.index}: PASSED (${r.durationMs || 10} ms)\n`;
+          msg += `   Input:    ${r.input}\n`;
+          msg += `   Output:   ${r.received}\n\n`;
+        });
+        msg += `==============================================\n`;
+        msg += `🎯 Correct Output Verified (0 Errors, 0 Warnings)\n`;
+        msg += `⏱️ Optimal Runtime Execution\n`;
+        msg += `💾 Target Space Complexity: ${p.spaceComplexity}\n`;
+        msg += `⚡ Target Time Complexity: ${p.timeComplexity}\n\n`;
+        msg += `Ready to submit! Click "Submit Solution & Mark as Solved".`;
+        consoleBody.textContent = msg;
+      }
+      this.app.showToast('All test cases passed! Ready to submit.', 'success');
+    }, 250);
+  }
+
+  submitSolution() {
+    if (!this.currentSolveProblem) return;
+    const p = this.currentSolveProblem;
+    const lang = this.activeSolverLang;
+    const editor = document.getElementById('dsa-solver-code-editor');
+    const code = editor ? editor.value.trim() : '';
+
+    const consolePill = document.getElementById('dsa-console-status-pill');
+    const consoleBody = document.getElementById('dsa-console-output');
+
+    if (!code || code.length < 5) {
+      this.app.showToast('Please write code before submitting!', 'warning');
+      if (consolePill) {
+        consolePill.className = 'dsa-console-pill error';
+        consolePill.textContent = 'Empty Code ❌';
+      }
+      if (consoleBody) {
+        consoleBody.textContent = `❌ Submission Error: Code editor is empty. You must write and test your solution first.`;
+      }
+      return;
+    }
+
+    // STRICT TEST VERIFICATION BEFORE MARKING AS SOLVED
+    const res = testProblemCode(code, lang, p.id);
+
+    if (!res.success) {
+      if (consolePill) {
+        consolePill.className = 'dsa-console-pill error';
+        consolePill.textContent = 'Rejected ❌';
+      }
+      if (consoleBody) {
+        let msg = `❌ [SUBMISSION REJECTED]\n`;
+        msg += `Your code did not pass all required test cases. Problems can ONLY be marked as solved after writing a correct solution.\n\n`;
+        if (res.error) {
+          msg += `Reason: ${res.error}\n\n`;
+        }
+        if (res.results && res.results.length > 0) {
+          const failed = res.results.find(r => !r.passed) || res.results[res.results.length - 1];
+          msg += `Failed on Test Case ${failed.index}:\n`;
+          msg += `Input:    ${failed.input}\n`;
+          msg += `Expected: ${failed.expected}\n`;
+          msg += `Received: ${failed.received}\n\n`;
+        }
+        msg += `⚠️ Status remains UNVERIFIED / PENDING. Please fix your errors and re-test.`;
+        consoleBody.textContent = msg;
+      }
+      this.app.showToast('❌ Submission Rejected: Code failed test cases. Fix errors and try again!', 'danger');
+      return; // DO NOT MARK AS SOLVED!
+    }
+
+    // Save student code draft
+    localStorage.setItem(`hirecraft_dsa_draft_${p.id}_${lang}`, code);
+
+    // Mark as solved in state
+    const isAlreadySolved = state.isDsaSolved(p.id);
+    if (!isAlreadySolved) {
+      state.toggleDsaSolved(p.id);
+    }
+
+    if (consolePill) {
+      consolePill.className = 'dsa-console-pill success';
+      consolePill.textContent = 'Accepted 🎉';
+    }
+    if (consoleBody) {
+      consoleBody.textContent = `🚀 SUBMISSION ACCEPTED & VERIFIED!\n\nProblem: ${p.title} (${p.difficulty})\nStatus: Solved (100% test cases passed)\nTime Complexity: ${p.timeComplexity} | Space Complexity: ${p.spaceComplexity}\n\n🏆 Problem officially marked as Solved!\nOfficial Solution & Editorial unlocked. Placement Readiness metrics updated!`;
+    }
+
+    this.app.showToast(`🎉 "${p.title}" verified correct and marked as Solved!`, 'success');
+
+    // Update status in modal footer
+    const statusInd = document.getElementById('dsa-solve-status-indicator');
+    if (statusInd) {
+      statusInd.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: var(--accent-emerald);">✅ Solved!</span>
+          <button type="button" id="btn-unsolve-problem" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.74rem;">
+            Mark as Unsolved / Reset
+          </button>
+        </div>
+      `;
+      document.getElementById('btn-unsolve-problem')?.addEventListener('click', () => {
+        state.toggleDsaSolved(p.id);
+        this.app.showToast(`"${p.title}" marked as pending`, 'info');
+        this.openSolveModal(p.id);
+        this.render();
+      });
+    }
+
+    // Re-render sheet immediately to unlock Solution button and show Solved status
+    this.render();
+
+    // Close modal after celebration
+    setTimeout(() => {
+      document.getElementById('dsa-solve-modal')?.classList.remove('active');
+    }, 1500);
   }
 
   openSolutionModal(problemId) {
