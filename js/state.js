@@ -46,6 +46,8 @@ const DEFAULT_PROJECTS = [
 
 const DEFAULT_RESUME = {
   fileName: 'Sachin_AK_Software_Engineer_Resume.pdf',
+  fileSize: '142 KB',
+  fileType: 'PDF Document',
   targetRole: 'Software Development Engineer (SDE-1)',
   atsScore: 84,
   lastAudited: new Date().toISOString(),

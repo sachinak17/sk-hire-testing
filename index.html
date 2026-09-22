@@ -25,6 +25,10 @@
   <link rel="stylesheet" href="css/style.css?v=cyber-sapphire-v1" />
   <link rel="stylesheet" href="css/components.css?v=cyber-sapphire-v1" />
   <link rel="stylesheet" href="css/auth.css?v=cyber-sapphire-v1" />
+
+  <!-- Client-side Document Extractors for Real Resume Uploads from Drive (Local + Same Origin) -->
+  <script src="js/libs/pdf.min.js"></script>
+  <script src="js/libs/mammoth.browser.min.js"></script>
 </head>
 <body data-active-view="jobs">
 
@@ -448,33 +452,127 @@
 
   <!-- 3C. ATS Resume Analyzer Modal -->
   <div class="modal-overlay" id="resume-modal">
-    <div class="modal-card" style="max-width: 720px;">
+    <div class="modal-card" style="max-width: 780px;">
       <div class="modal-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.4rem;">📄</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            📄
+          </div>
           <div>
-            <h3 style="font-size: 1.2rem; font-weight: 800;">ATS Resume Audit & Scorecard</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Scan your resume for recruiter ATS keywords, impact metrics, and contact integrity.</p>
+            <h3 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">ATS Resume Audit & Drive Upload</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Upload your real resume from drive/device to audit keywords, impact metrics, and ATS compatibility.</p>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="resume-modal">✕</button>
       </div>
       <form id="resume-audit-form">
-        <div class="modal-body" style="max-height: 480px; overflow-y: auto;">
-          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div class="modal-body" style="max-height: 520px; overflow-y: auto;">
+
+          <!-- Role & Config Selector -->
+          <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-bottom: 16px;">
             <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Target Engineering Role</label>
-              <input type="text" id="resume-target-role" class="search-input" style="padding: 10px;" value="Software Development Engineer (SDE-1)" />
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 5px;">Target Engineering Track</label>
+              <select id="resume-target-role" class="filter-select" style="width: 100%; padding: 10px 14px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);">
+                <option value="Software Development Engineer (SDE-1)">Software Development Engineer (SDE-1)</option>
+                <option value="Full Stack Developer">Full Stack Developer (React & Node/Python)</option>
+                <option value="Frontend Engineer">Frontend Engineer (React / TypeScript / Next.js)</option>
+                <option value="Backend Engineer">Backend Engineer (Distributed Systems / APIs)</option>
+                <option value="DevOps & Cloud Engineer">DevOps & Cloud Engineer (AWS / Docker / K8s)</option>
+                <option value="Data Scientist / AI Engineer">Data Scientist / AI Engineer (ML / Python)</option>
+              </select>
             </div>
             <div>
-              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Resume File / Title</label>
-              <input type="text" id="resume-filename" class="search-input" style="padding: 10px;" value="Sachin_AK_Resume.pdf" />
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 5px;">Resume Document Name</label>
+              <input type="text" id="resume-filename" class="search-input" style="padding: 10px 14px;" value="Sachin_AK_Resume.pdf" />
             </div>
           </div>
 
-          <div style="margin-bottom: 16px;">
-            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Paste Resume Text (or Summary of Skills, Projects & Experience)</label>
-            <textarea id="resume-paste-text" class="search-input" rows="6" style="padding: 12px; font-size: 0.85rem;" placeholder="Paste resume content here to run instant automated ATS analysis (detects keywords, metrics, github, linkedin, contact info)...">Sachin A K
+          <!-- Upload Method Switcher Tabs -->
+          <div class="resume-source-tabs" style="display: flex; gap: 8px; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px;">
+            <button type="button" class="resume-tab-btn active" id="tab-btn-file-upload">
+              📂 Upload from Drive / Computer
+            </button>
+            <button type="button" class="resume-tab-btn" id="tab-btn-gdrive">
+              ☁️ Google Drive Link
+            </button>
+            <button type="button" class="resume-tab-btn" id="tab-btn-paste">
+              ✍️ Manual Text
+            </button>
+          </div>
+
+          <!-- Pane 1: File Dropzone (Default) -->
+          <div id="pane-file-upload" class="resume-tab-pane">
+            <div class="resume-upload-dropzone" id="resume-dropzone">
+              <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.txt" style="display: none;" />
+              <div class="dropzone-inner">
+                <div class="dropzone-icon-wrap">
+                  <span class="dropzone-icon">📤</span>
+                </div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary);">
+                  Upload Real Resume from your Drive
+                </h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
+                  Drag & drop your resume file here or browse from local disk.<br />
+                  Supports <strong style="color: var(--accent-cyan);">PDF</strong>, <strong style="color: var(--accent-cyan);">DOCX</strong>, and <strong style="color: var(--accent-cyan);">TXT</strong> (Up to 10MB)
+                </p>
+                <button type="button" class="btn btn-secondary" id="btn-browse-file" style="font-size: 0.85rem; padding: 8px 18px; border-color: var(--primary);">
+                  📁 Browse from Drive / Device
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pane 2: Google Drive Share Link -->
+          <div id="pane-gdrive-upload" class="resume-tab-pane" style="display: none;">
+            <div style="background: var(--bg-surface-elevated); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Google Drive File / Docs Sharing Link</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="url" id="resume-gdrive-url" class="search-input" style="padding: 10px 14px; flex: 1;" placeholder="https://drive.google.com/file/d/1A2B3C.../view?usp=sharing" />
+                <button type="button" class="btn btn-secondary" id="btn-import-gdrive" style="white-space: nowrap;">
+                  📥 Fetch & Parse
+                </button>
+              </div>
+              <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; margin-bottom: 0;">
+                Make sure your Google Drive link has sharing permission set to <em>"Anyone with the link can view"</em>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Loading / Parsing Progress -->
+          <div id="resume-parse-progress" class="resume-parse-progress" style="display: none;">
+            <div class="parse-spinner"></div>
+            <div style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 600;" id="resume-parse-status-text">
+              Reading file from drive & extracting text content...
+            </div>
+          </div>
+
+          <!-- Uploaded File Status Pill Card -->
+          <div id="uploaded-file-card" class="uploaded-file-card" style="display: none;">
+            <div class="file-card-left">
+              <span class="file-format-badge" id="file-format-icon">📄 PDF</span>
+              <div>
+                <div class="file-card-name" id="file-card-name-label">Sachin_AK_Resume.pdf</div>
+                <div class="file-card-meta" id="file-card-meta-label">142 KB • Ready for ATS Evaluation</div>
+              </div>
+            </div>
+            <div class="file-card-actions">
+              <span class="badge badge-success" id="file-card-status-badge" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 8px; border-radius: 6px;">✓ Extracted</span>
+              <button type="button" class="btn-change-file" id="btn-replace-file" title="Select a different resume file from drive">
+                🔄 Change File
+              </button>
+              <button type="button" class="btn-remove-resume" id="btn-remove-resume" title="Remove current resume from profile">
+                🗑️ Remove Resume
+              </button>
+            </div>
+          </div>
+
+          <!-- Collapsible Extracted Resume Text Area -->
+          <details class="resume-text-accordion" id="resume-text-details" style="margin-bottom: 16px;">
+            <summary style="cursor: pointer; font-size: 0.84rem; font-weight: 600; color: var(--text-secondary); padding: 8px 0; user-select: none;">
+              <span>👁️ View / Refine Extracted Resume Text (<span id="resume-word-count-badge">85</span> words)</span>
+            </summary>
+            <div style="margin-top: 8px;">
+              <textarea id="resume-paste-text" class="search-input" rows="6" style="padding: 12px; font-size: 0.85rem; line-height: 1.5;" placeholder="Resume content will automatically appear here once uploaded from drive...">Sachin A K
 Email: sachin@candidate.com | Phone: +91 9876543210 | GitHub: https://github.com/sachinak | LinkedIn: https://linkedin.com/in/sachinak
 Target Role: Software Development Engineer
 
@@ -486,30 +584,73 @@ TECHNICAL SKILLS:
 PROJECTS:
 - DevSphere: Developed real-time collaborative code editor serving 1,200+ users. Reduced latency by 35% using WebSocket connections.
 - HireMatrix: Architected job placement platform with ATS scanner, optimizing candidate shortlisting by 45%. Implemented robust authentication with bcrypt and JWT.</textarea>
-          </div>
+            </div>
+          </details>
 
-          <button type="button" class="btn btn-secondary btn-full" id="btn-run-resume-audit" style="font-weight: 700; margin-bottom: 16px;">
-            🔍 Scan & Calculate ATS Score
+          <!-- Action Button: Run Audit -->
+          <button type="button" class="btn btn-secondary btn-full" id="btn-run-resume-audit" style="font-weight: 700; margin-bottom: 16px; border-color: rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.08);">
+            🔍 Run ATS Recruiter Audit & Calculate Score
           </button>
 
           <!-- Audit Results Area -->
-          <div id="resume-audit-results" style="background: var(--bg-surface-elevated); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span style="font-weight: 800; font-size: 0.95rem;">ATS Audit Scorecard</span>
-              <span id="resume-ats-score-display" style="font-size: 1.4rem; font-weight: 900; color: var(--accent-emerald);">84%</span>
+          <div id="resume-audit-results" style="background: var(--bg-surface-elevated); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+              <div>
+                <span style="font-weight: 800; font-size: 1rem; color: var(--text-primary); display: block;">ATS Recruiter Scorecard</span>
+                <span id="resume-match-tier-label" style="font-size: 0.78rem; color: var(--accent-emerald); font-weight: 600;">Strong Recruiter Match (Tier 1 Ready)</span>
+              </div>
+              <div style="text-align: right;">
+                <span id="resume-ats-score-display" style="font-size: 1.6rem; font-weight: 900; color: var(--accent-emerald);">84%</span>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Weighted ATS Index</div>
+              </div>
             </div>
-            <div id="resume-feedback-list" style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+
+            <!-- Scorecard Micro-Pillars Grid -->
+            <div class="ats-metric-badges-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
+              <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Contacts Found</div>
+                <div id="ats-contacts-count" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-emerald);">4/4 Verified</div>
+              </div>
+              <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Tech Keywords</div>
+                <div id="ats-keywords-count" style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">14 Matched</div>
+              </div>
+              <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Impact Metrics</div>
+                <div id="ats-metrics-count" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-amber);">3 Detected</div>
+              </div>
+              <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Action Verbs</div>
+                <div id="ats-verbs-count" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan);">4 Identified</div>
+              </div>
+            </div>
+
+            <!-- Matched Keywords Chips Area -->
+            <div id="resume-keywords-chips-wrap" style="margin-bottom: 12px;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Identified Technical Competencies:</div>
+              <div id="resume-keywords-chips" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <span class="ats-chip ats-chip-matched">React</span>
+                <span class="ats-chip ats-chip-matched">Node.js</span>
+                <span class="ats-chip ats-chip-matched">Python</span>
+                <span class="ats-chip ats-chip-matched">SQL</span>
+                <span class="ats-chip ats-chip-matched">Docker</span>
+              </div>
+            </div>
+
+            <!-- Detailed Recruiter Feedback List -->
+            <div id="resume-feedback-list" style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
               <div style="color: var(--accent-emerald); font-weight: 600; margin-bottom: 4px;">✓ Verified Contacts: Email, Phone, GitHub, LinkedIn detected</div>
               <div style="color: var(--primary); font-weight: 600; margin-bottom: 4px;">✓ Matched 14 Core Tech Keywords: React, Node, Python, SQL, Docker, APIs...</div>
               <div style="color: var(--accent-amber); font-weight: 600;">✓ Quantifiable Impact Metrics detected (e.g. 1,200+ users, 35% latency reduction)</div>
             </div>
           </div>
         </div>
-        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding: 16px 24px;">
           <span style="font-size: 0.82rem; color: var(--accent-cyan);">Contributes up to 15 pts to your Hire Score</span>
           <div style="display: flex; gap: 10px;">
             <button type="button" class="btn btn-secondary" data-close-modal="resume-modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save to Profile & Recalculate</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-resume-profile">💾 Save to Profile & Recalculate</button>
           </div>
         </div>
       </form>

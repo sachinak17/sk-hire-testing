@@ -95,8 +95,8 @@ export class HireScoreEngine {
     projScore = Math.min(Math.round(projScore), 15);
 
     // 5. RESUME / ATS (Max 15 pts)
-    const resume = state.resumeProfile || { atsScore: 78 };
-    const atsScore = resume.atsScore || 0;
+    const resume = state.resumeProfile || {};
+    const atsScore = (resume.fileName && resume.fileName.trim()) ? (resume.atsScore || 0) : 0;
     const resumePoints = Math.min(Math.round((atsScore / 100) * 15), 15);
 
     // 6. INTERVIEW READINESS (Max 15 pts)
@@ -243,10 +243,15 @@ export class HireScoreEngine {
           score: resumePoints,
           max: 15,
           percent: Math.round((resumePoints / 15) * 100),
-          atsScore: resume.atsScore || 78,
-          fileName: resume.fileName || 'Candidate_Resume.pdf',
+          atsScore,
+          fileName: resume.fileName || '',
+          fileSize: resume.fileSize || '',
+          fileType: resume.fileType || '',
+          lastAudited: resume.lastAudited || '',
           icon: '📄',
-          summary: `ATS keyword & format index: ${resume.atsScore || 78}%`
+          summary: (resume.fileName && resume.fileName.trim()) 
+            ? `ATS keyword & format index: ${atsScore}%` 
+            : 'No resume uploaded yet (0/15 pts)'
         },
         interview: {
           name: 'Interview & Soft Skills',
@@ -263,59 +268,170 @@ export class HireScoreEngine {
   }
 
   /**
-   * Run automated ATS Resume Audit
+   * Run automated ATS Resume Audit with deep keyword, metrics, contact, and role alignment
    */
-  static auditResume(resumeText, targetRole = 'Software Engineer') {
-    const text = (resumeText || '').toLowerCase();
+  static auditResume(resumeText, targetRole = 'Software Development Engineer (SDE-1)') {
+    const rawText = (resumeText || '').trim();
+    if (!rawText) {
+      return {
+        atsScore: 0,
+        tierLabel: 'No Resume Content',
+        wordCount: 0,
+        contacts: { hasEmail: false, hasPhone: false, hasGithub: false, hasLinkedin: false, hasPortfolio: false },
+        contactsCount: 0,
+        matchedKeywords: [],
+        missingKeywords: ['JavaScript', 'Python', 'React', 'SQL', 'Docker'],
+        matchedVerbs: [],
+        hasMetrics: false,
+        metricCount: 0,
+        detectedSections: [],
+        feedback: ['No resume uploaded yet. Upload a real PDF or Word resume from your drive to evaluate ATS score.']
+      };
+    }
+
+    const text = rawText.toLowerCase();
+    const words = text.split(/\s+/).filter(w => w.length > 0);
+    const wordCount = words.length;
     
     // 1. Contact & Socials Check
     const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text);
-    const hasPhone = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(text) || text.includes('phone') || text.includes('+91');
-    const hasGithub = text.includes('github.com') || text.includes('github:');
-    const hasLinkedin = text.includes('linkedin.com') || text.includes('linkedin:');
+    const hasPhone = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(text) || 
+                     /\+?91[\s-]?\d{10}/.test(text) || 
+                     /\b[6-9]\d{9}\b/.test(text) || 
+                     text.includes('phone') || text.includes('contact');
+    const hasGithub = text.includes('github.com') || text.includes('github:') || text.includes('gh/');
+    const hasLinkedin = text.includes('linkedin.com') || text.includes('linkedin:') || text.includes('in/');
+    const hasPortfolio = text.includes('portfolio') || text.includes('vercel.app') || text.includes('netlify.app') || text.includes('github.io');
 
-    // 2. Core CS Keywords
-    const KEYWORDS = [
-      'javascript', 'python', 'java', 'c++', 'react', 'node', 'express',
-      'sql', 'mongodb', 'docker', 'aws', 'git', 'api', 'rest',
-      'data structures', 'algorithms', 'agile', 'linux', 'testing'
+    let contactsCount = 0;
+    if (hasEmail) contactsCount++;
+    if (hasPhone) contactsCount++;
+    if (hasGithub) contactsCount++;
+    if (hasLinkedin) contactsCount++;
+    if (hasPortfolio) contactsCount++;
+
+    // 2. Keyword Dictionaries
+    const BASE_TECH_KEYWORDS = [
+      'javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'sql', 'html', 'css',
+      'react', 'node', 'express', 'postgresql', 'mongodb', 'docker', 'aws', 'git', 'github',
+      'data structures', 'algorithms', 'system design', 'rest', 'api', 'linux', 'testing'
     ];
-    const matchedKeywords = KEYWORDS.filter(k => text.includes(k));
+
+    const ROLE_SPECIALIZATIONS = {
+      'Frontend': ['react', 'next.js', 'vue', 'angular', 'tailwind', 'typescript', 'redux', 'webpack', 'css3', 'responsive'],
+      'Backend': ['node', 'express', 'python', 'django', 'fastapi', 'spring', 'postgresql', 'mongodb', 'redis', 'microservices', 'rest'],
+      'Full Stack': ['react', 'node', 'express', 'postgresql', 'mongodb', 'typescript', 'api', 'docker', 'git', 'tailwind'],
+      'DevOps': ['docker', 'kubernetes', 'aws', 'ci/cd', 'terraform', 'linux', 'bash', 'jenkins', 'cloud', 'git'],
+      'Data': ['python', 'sql', 'machine learning', 'pandas', 'numpy', 'tensorflow', 'pytorch', 'scikit', 'etl', 'deep learning']
+    };
+
+    // Determine relevant role keywords
+    let roleKeywords = BASE_TECH_KEYWORDS;
+    for (const [key, list] of Object.entries(ROLE_SPECIALIZATIONS)) {
+      if (targetRole.toLowerCase().includes(key.toLowerCase())) {
+        roleKeywords = [...new Set([...BASE_TECH_KEYWORDS, ...list])];
+        break;
+      }
+    }
+
+    const matchedKeywords = roleKeywords.filter(k => text.includes(k));
+    const missingKeywords = roleKeywords.filter(k => !text.includes(k)).slice(0, 5);
 
     // 3. Quantifiable Impact Metrics
-    const hasMetrics = /\b\d+%\b|\b\d+k\b|\b\d+x\b|\b\$\d+|\b\d+\s*(users|clients|requests|ms|seconds|stars)/i.test(text);
+    const metricMatches = text.match(/\b\d+(?:\.\d+)?%|\b[\d,]+k\b|\b\d+x\b|\b\$\d+|\b[\d,]+\+?\s*(?:active\s*)?(users|clients|requests|resumes|ms|milliseconds|seconds|stars|downloads|rps|tps|qps|queries|hours|uptime)/gi) || [];
+    const hasMetrics = metricMatches.length > 0;
 
     // 4. Action Verbs
-    const ACTION_VERBS = ['designed', 'developed', 'implemented', 'optimized', 'architected', 'scaled', 'built', 'reduced', 'increased'];
+    const ACTION_VERBS = [
+      'designed', 'developed', 'implemented', 'optimized', 'architected', 'scaled',
+      'built', 'reduced', 'increased', 'automated', 'engineered', 'deployed', 'refactored', 'created'
+    ];
     const matchedVerbs = ACTION_VERBS.filter(v => text.includes(v));
 
-    // Calculate ATS Score
-    let score = 50; // base score
+    // 5. Sections Detection
+    const sections = ['skills', 'experience', 'projects', 'education', 'certifications'];
+    const detectedSections = sections.filter(s => text.includes(s));
+
+    // Calculate Balanced Weighted ATS Score (0-100)
+    let score = 40; // baseline
+    // Contact Info (up to 20 pts)
     if (hasEmail) score += 5;
     if (hasPhone) score += 5;
-    if (hasGithub) score += 7;
+    if (hasGithub) score += 5;
     if (hasLinkedin) score += 5;
-    score += Math.min(matchedKeywords.length * 2, 16);
-    if (hasMetrics) score += 8;
-    score += Math.min(matchedVerbs.length * 1, 6);
 
-    const atsScore = Math.min(Math.max(score, 40), 98);
+    // Keywords (up to 24 pts)
+    score += Math.min(matchedKeywords.length * 2, 24);
 
+    // Impact Metrics (up to 10 pts)
+    score += Math.min(metricMatches.length * 3, 10);
+
+    // Action Verbs (up to 6 pts)
+    score += Math.min(matchedVerbs.length * 1.5, 6);
+
+    // Sections detected (up to 5 pts)
+    score += Math.min(detectedSections.length * 1.25, 5);
+
+    // Length check: ensure resume has enough substance
+    if (wordCount >= 70) score += 3;
+
+    const atsScore = Math.min(Math.max(Math.round(score), 35), 98);
+
+    // Tier Label
+    let tierLabel = 'Foundation Match (Needs Refinement)';
+    if (atsScore >= 85) {
+      tierLabel = '💎 Exceptional Recruiter Match (Tier 1 Ready)';
+    } else if (atsScore >= 70) {
+      tierLabel = '🚀 Strong ATS Compatibility (Tier 2/Unicorn Ready)';
+    } else if (atsScore >= 55) {
+      tierLabel = '⚡ Moderate Match (Add Metrics & Tech Keywords)';
+    }
+
+    // Recruiter Feedback
     const feedback = [];
-    if (!hasMetrics) feedback.push('Add quantifiable impact metrics (e.g. "Reduced load time by 34%", "Served 5,000+ users").');
-    if (!hasGithub) feedback.push('Include your GitHub profile link to showcase verifiable source code.');
-    if (matchedKeywords.length < 6) feedback.push('Increase keyword density for target role: include technologies like SQL, APIs, Docker, and React.');
-    if (feedback.length === 0) feedback.push('Great keyword density, clean structure, and strong metric attribution!');
+    if (!hasMetrics) {
+      feedback.push('Add quantifiable impact metrics (e.g. "Reduced query latency by 35%", "Served 2,500+ active users").');
+    } else {
+      feedback.push(`Strong metric attribution detected (${metricMatches.length} quantifiable data points found).`);
+    }
+
+    if (!hasGithub) {
+      feedback.push('Include a verifiable GitHub profile link showing active commits and repositories.');
+    }
+    if (!hasLinkedin) {
+      feedback.push('Add your LinkedIn profile URL so recruiters can verify credentials and network.');
+    }
+
+    if (missingKeywords.length > 0 && matchedKeywords.length < 10) {
+      feedback.push(`Increase keyword coverage for ${targetRole}: Consider highlighting ${missingKeywords.slice(0, 4).join(', ')}.`);
+    }
+
+    if (matchedVerbs.length < 3) {
+      feedback.push('Start bullet points with strong action verbs (e.g., "Architected", "Engineered", "Optimized", "Scaled").');
+    }
+
+    if (feedback.length === 0) {
+      feedback.push('Exceptional structure, high keyword density, and strong quantifiable achievements!');
+    }
 
     return {
       atsScore,
-      hasEmail,
-      hasPhone,
-      hasGithub,
-      hasLinkedin,
+      tierLabel,
+      wordCount,
+      contacts: {
+        hasEmail,
+        hasPhone,
+        hasGithub,
+        hasLinkedin,
+        hasPortfolio
+      },
+      contactsCount,
       matchedKeywords,
+      missingKeywords,
       matchedVerbs,
       hasMetrics,
+      metricCount: metricMatches.length,
+      detectedSections,
       feedback
     };
   }

@@ -326,6 +326,11 @@ export class JobsModule {
     document.getElementById('apply-modal-title').textContent = `Easy Apply to ${job.company}`;
     document.getElementById('apply-modal-subtitle').textContent = `${job.title} • ${job.location}`;
 
+    const resumeNameEl = document.getElementById('apply-resume-name');
+    if (resumeNameEl && state.resumeProfile && state.resumeProfile.fileName) {
+      resumeNameEl.value = state.resumeProfile.fileName;
+    }
+
     modal.classList.add('active');
   }
 
