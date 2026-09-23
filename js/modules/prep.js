@@ -41,6 +41,7 @@ export class PrepModule {
         
         // Default subcat
         if (this.activeTab === 'technical') this.activeSubcatId = 'os';
+        else if (this.activeTab === 'aptitude') this.activeSubcatId = 'quant';
 
         this.render();
       });
@@ -64,6 +65,8 @@ export class PrepModule {
 
     if (this.activeTab === 'technical') {
       this.renderStudyAndQuizHub(container, PREP_DATA.technical);
+    } else if (this.activeTab === 'aptitude') {
+      this.renderStudyAndQuizHub(container, PREP_DATA.aptitude);
     } else if (this.activeTab === 'hr') {
       this.renderHrHub(container, PREP_DATA.hr);
     }

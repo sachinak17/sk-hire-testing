@@ -70,6 +70,21 @@ export const PREP_DATA = {
               'AND condition = Multiplication principle; OR condition = Addition principle.',
               'Complementary probability: P(At least one) = 1 - P(None).'
             ]
+          },
+          {
+            topic: 'Number Systems, Divisibility & HCF / LCM',
+            summary: 'Prime factorizations, remainder theorems, and modular arithmetic shortcuts.',
+            formulas: [
+              'Dividend = (Divisor × Quotient) + Remainder',
+              'Product of two numbers = HCF × LCM',
+              'HCF of Fractions = (HCF of Numerators) / (LCM of Denominators)',
+              'LCM of Fractions = (LCM of Numerators) / (HCF of Denominators)'
+            ],
+            keyPoints: [
+              'Divisibility by 3 or 9: Sum of digits is divisible by 3 or 9.',
+              'Divisibility by 4: Last 2 digits divisible by 4. Divisibility by 8: Last 3 digits divisible by 8.',
+              'Divisibility by 11: Difference between sum of odd-placed digits and even-placed digits is 0 or multiple of 11.'
+            ]
           }
         ],
         quizQuestions: [
@@ -107,6 +122,13 @@ export const PREP_DATA = {
             options: ['1/4', '1/6', '7/36', '5/36'],
             correctIndex: 0,
             explanation: 'Total outcomes = 6 × 6 = 36. Sums divisible by 4 are 4, 8, 12. Sum 4: (1,3),(2,2),(3,1) = 3 ways. Sum 8: (2,6),(3,5),(4,4),(5,3),(6,2) = 5 ways. Sum 12: (6,6) = 1 way. Total favorable = 3 + 5 + 1 = 9 ways. Probability = 9 / 36 = 1/4.'
+          },
+          {
+            id: 'q_quant_6',
+            question: 'The HCF of two numbers is 11 and their LCM is 7700. If one of the numbers is 275, what is the other number?',
+            options: ['279', '283', '308', '318'],
+            correctIndex: 2,
+            explanation: 'Product of two numbers = HCF × LCM. 275 × Other = 11 × 7700. Other = (11 × 7700) / 275 = 84700 / 275 = 308.'
           }
         ]
       },
@@ -140,6 +162,15 @@ export const PREP_DATA = {
               'A conclusion is valid ONLY if it follows in ALL possible Venn diagram representations.',
               '"Either / Or" rule applies when: (1) Same subjects/predicates, (2) Both conclusions individually false, (3) One positive and one negative pair (Some + No or All + Some Not).'
             ]
+          },
+          {
+            topic: 'Seating Arrangements & Linear Scheduling',
+            summary: 'Circular and linear arrangement problem solving strategies.',
+            keyPoints: [
+              'Circular Table Facing Center: Moving clockwise = Left turn; Moving counter-clockwise = Right turn.',
+              'Circular Table Facing Outward: Moving clockwise = Right turn; Moving counter-clockwise = Left turn.',
+              'Always start with definitive statements (e.g. "X sits third to the right of Y") and build positional cases for uncertain conditions.'
+            ]
           }
         ],
         quizQuestions: [
@@ -163,6 +194,13 @@ export const PREP_DATA = {
             options: ['Only conclusion I follows', 'Only conclusion II follows', 'Both follow', 'Neither follows'],
             correctIndex: 1,
             explanation: 'All mangoes are golden, and no golden things are cheap. Thus, mangoes cannot be cheap. Conclusion I is false. Conclusion II ("Golden colored mangoes are not cheap") directly follows from statement 2.'
+          },
+          {
+            id: 'q_log_4',
+            question: 'Six persons A, B, C, D, E, and F are sitting in a circle facing the center. B is between F and C. A is second to the left of D and second to the right of E. Who is facing D?',
+            options: ['B', 'E', 'F', 'C'],
+            correctIndex: 0,
+            explanation: 'Placing the positions: E is placed, A is 2 positions right of E, D is 2 positions right of A (so D is opposite to B). F and C sit adjacent to B. Hence, B is directly opposite (facing) D.'
           }
         ]
       },
@@ -182,6 +220,15 @@ export const PREP_DATA = {
             keyPoints: [
               'Beware of intervening prepositional phrases between subject and verb.',
               'Words like "Everyone, Somebody, Anybody, Each" are always singular.'
+            ]
+          },
+          {
+            topic: 'Sentence Correction, Modifiers & Parallelism',
+            summary: 'Dangling modifiers, parallel structure, and idiom rules.',
+            keyPoints: [
+              'Dangling Modifier: A descriptive phrase must immediately precede or follow the noun it actually modifies.',
+              'Parallelism: Elements in a list or comparison must maintain identical grammatical forms (e.g., "She likes swimming, hiking, and to run" is incorrect -> "swimming, hiking, and running").',
+              'Active vs Passive voice: Active voice is concise and direct; passive voice is appropriate when the actor is unknown or unimportant.'
             ]
           }
         ],
@@ -204,6 +251,18 @@ export const PREP_DATA = {
             options: ['Fleeting', 'Transient', 'Permanent', 'Fragile'],
             correctIndex: 2,
             explanation: '"Ephemeral" means lasting for a very short time. The opposite (antonym) is "Permanent".'
+          },
+          {
+            id: 'q_verb_3',
+            question: 'Find the error in: "Having finished his homework, the television was turned on by Sam."',
+            options: [
+              'No error',
+              'Dangling modifier: The introductory phrase modifies Sam, not the television',
+              'Incorrect tense of "turned on"',
+              'Wrong preposition "by"'
+            ],
+            correctIndex: 1,
+            explanation: 'The television did not finish homework! The modifier "Having finished his homework" must be followed by Sam: "Having finished his homework, Sam turned on the television."'
           }
         ]
       }
@@ -244,6 +303,25 @@ export const PREP_DATA = {
               'Page Replacement Algorithms: FIFO, LRU (Least Recently Used), Optimal (Belady’s optimal - benchmark), LFU.',
               'Belady\'s Anomaly: In FIFO page replacement, increasing page frames can paradoxically increase page faults.'
             ]
+          },
+          {
+            topic: 'Concurrency, Semaphores & Critical Section',
+            summary: 'Synchronization primitives, race conditions, Peterson\'s Algorithm, and classic synchronization problems.',
+            keyPoints: [
+              'Critical Section requirements: 1) Mutual Exclusion, 2) Progress (only processes wishing to enter participate in decision), 3) Bounded Waiting (no indefinite starvation).',
+              'Mutex vs Semaphore: Mutex is a locking mechanism owned by a single thread (binary 0/1); Semaphore is a signaling mechanism with an integer counter (Counting Semaphore) allowing up to N concurrent threads.',
+              'Classic Synchronization Problems: Producer-Consumer (bounded buffer with full/empty semaphores), Readers-Writers (prevent writer starvation), Dining Philosophers (deadlock avoidance via resource hierarchy or odd/even pickup).'
+            ]
+          },
+          {
+            topic: 'File Systems, Inodes & Linux System Calls',
+            summary: 'File allocation, directory structures, inodes, and process control system calls.',
+            keyPoints: [
+              'Inode contains metadata: file type, permissions, owner, size, timestamps, and data block pointers (direct, single indirect, double indirect). Inode does NOT store the filename (filename is in directory entry).',
+              'Hard Link: An extra directory entry pointing directly to the same inode number. Symbolic (Soft) Link: A separate file whose data contains the path string to the target file.',
+              'System Calls: fork() creates child process with Copy-On-Write address space; exec() replaces memory image with new binary; wait() collects child termination exit status.',
+              'Zombie vs Orphan: Zombie has finished executing but remains in process table until parent calls wait(); Orphan\'s parent died while running, so it is adopted by PID 1 (init / systemd).'
+            ]
           }
         ],
         quizQuestions: [
@@ -277,6 +355,30 @@ export const PREP_DATA = {
             ],
             correctIndex: 1,
             explanation: 'A safe state guarantees that there exists at least one safe sequence <P1, P2, ..., Pn> of process execution such that each process can satisfy its maximum resource claims without causing a deadlock.'
+          },
+          {
+            id: 'q_os_4',
+            question: 'What is the fundamental architectural difference between a Mutex and a Binary Semaphore?',
+            options: [
+              'A Mutex has an ownership concept (only the locking thread can unlock it), while a Semaphore can be signaled by any thread',
+              'A Mutex uses busy waiting while a Semaphore always sleeps',
+              'A Binary Semaphore can only count up to 10 while a Mutex has no limit',
+              'A Mutex is implemented purely in hardware while a Semaphore is purely software'
+            ],
+            correctIndex: 0,
+            explanation: 'A Mutex enforces strict ownership—only the thread that acquired the lock may release it. A Semaphore is a signaling primitive where thread A can signal (V) a semaphore that thread B is waiting (P) on.'
+          },
+          {
+            id: 'q_os_5',
+            question: 'What occurs when a child process terminates, but its parent process has not yet called wait()?',
+            options: [
+              'The child process immediately becomes an Orphan process',
+              'The child process becomes a Zombie process and retains an entry in the process table',
+              'The operating system restarts the child process automatically',
+              'A segmentation fault is generated for the parent process'
+            ],
+            correctIndex: 1,
+            explanation: 'A terminated process whose exit status has not yet been read by its parent via wait() is termed a Zombie process. It releases its memory but retains its PID and process table entry.'
           }
         ]
       },
@@ -312,6 +414,25 @@ export const PREP_DATA = {
               'B+ Trees keep all actual data pointers at leaf nodes linked in a doubly linked list, enabling rapid range scans and O(log N) point queries.',
               'Clustered Index: Determines physical order of data on disk (only 1 per table). Secondary/Non-Clustered Index: Separate structure containing pointers to table rows.'
             ]
+          },
+          {
+            topic: 'SQL Query Optimization & Join Execution Algorithms',
+            summary: 'How relational query planners execute joins, evaluate predicates, and utilize indexes.',
+            keyPoints: [
+              'Join Algorithms: 1) Nested Loop Join: O(M × N), optimal when one table is very small or has an index on join column. 2) Hash Join: Builds in-memory hash table on smaller input and probes with larger input, O(M + N). 3) Sort-Merge Join: Sorts both inputs and merges in linear time O(M log M + N log N), optimal for pre-sorted inputs.',
+              'EXPLAIN PLAN: Analyzes execution cost, scan type (Full Table Scan vs Index Range Scan vs Index Only Scan), and estimated rows.',
+              'Covering Index: An index that includes all columns referenced in the SELECT and WHERE clauses, allowing the query to be fulfilled entirely from the index tree without accessing table disk blocks.'
+            ]
+          },
+          {
+            topic: 'NoSQL Architectures, CAP Theorem & PACELC',
+            summary: 'Distributed data stores, partition tolerance, and eventual consistency models.',
+            keyPoints: [
+              'CAP Theorem: In a distributed system with Network Partition (P), you can only choose Consistency (C) OR Availability (A). CP examples: MongoDB, HBase; AP examples: Cassandra, DynamoDB, CouchDB.',
+              'PACELC Theorem: Extends CAP. If Partition (P): choose Availability (A) or Consistency (C); Else (E): choose Latency (L) or Consistency (C). Example: DynamoDB is PA/EL.',
+              'BASE Properties: Basically Available, Soft state, Eventual consistency. Contrasts with relational ACID.',
+              'NoSQL Categories: Key-Value (Redis), Document (MongoDB), Wide-Column (Cassandra), Graph (Neo4j).'
+            ]
           }
         ],
         quizQuestions: [
@@ -328,6 +449,30 @@ export const PREP_DATA = {
             options: ['Read Uncommitted', 'Read Committed', 'Repeatable Read', 'Serializable'],
             correctIndex: 2,
             explanation: 'Repeatable Read locks the rows that are read, preventing dirty reads and non-repeatable reads. However, newly inserted rows (phantoms) matching the query criteria can still appear on subsequent range queries unless Serializable is used.'
+          },
+          {
+            id: 'q_db_3',
+            question: 'In relational query processing, when is a Hash Join preferred over a Nested Loop Join?',
+            options: [
+              'When both tables are massive, unsorted, and neither has an index on the join predicate',
+              'When the inner table has fewer than 5 rows',
+              'When searching for non-equality joins (e.g., A.id < B.id)',
+              'When memory size is zero'
+            ],
+            correctIndex: 0,
+            explanation: 'Hash Join excels for equi-joins on large, unsorted datasets without existing indexes. It builds an in-memory hash table on the smaller dataset in O(M) and scans the larger dataset in O(N).'
+          },
+          {
+            id: 'q_db_4',
+            question: 'According to the CAP theorem, what trade-off must a distributed database make during a network partition?',
+            options: [
+              'Sacrifice Security for Performance',
+              'Choose either Consistency (returning error if data might be stale) or Availability (returning stale data)',
+              'Sacrifice Durability to preserve ACID Atomicity',
+              'Convert relational tables into document collections'
+            ],
+            correctIndex: 1,
+            explanation: 'When network partitions occur between distributed nodes, the system must either refuse requests to guarantee consistency (CP) or answer with potentially stale or unsynced data to ensure availability (AP).'
           }
         ]
       },
@@ -362,6 +507,24 @@ export const PREP_DATA = {
               'HTTPS runs HTTP over TLS/SSL (port 443 vs 80), providing encryption, data integrity, and server authentication.',
               'DNS resolution hierarchy: Browser cache -> OS resolver -> Recursive Resolver (ISP) -> Root Nameserver (.) -> TLD Nameserver (.com) -> Authoritative Nameserver.'
             ]
+          },
+          {
+            topic: 'IPv4 Subnetting, CIDR & Network Address Translation (NAT)',
+            summary: 'IP address planning, subnet masks, slash notation, and address conservation.',
+            keyPoints: [
+              'CIDR (Classless Inter-Domain Routing): e.g. 192.168.1.0/24 means 24 network bits and 8 host bits. Total IP addresses = 2^(32 - prefix). Usable hosts = 2^(32 - prefix) - 2 (subtract Network ID and Broadcast ID).',
+              'Subnet Mask calculation: /26 = 255.255.255.192. Block size = 256 - 192 = 64. Subnets: .0, .64, .128, .192. Usable host range for .64 is .65 to .126.',
+              'NAT (Network Address Translation): Maps multiple private RFC 1918 IPs (10.x.x.x, 172.16-31.x.x, 192.168.x.x) to a single public IP using port multiplexing (PAT - Port Address Translation).'
+            ]
+          },
+          {
+            topic: 'Modern Web Protocols: WebSocket, HTTP/2, HTTP/3 & TLS 1.3',
+            summary: 'Multiplexing, stream prioritization, QUIC transport over UDP, and modern encryption.',
+            keyPoints: [
+              'HTTP/1.1 vs HTTP/2 vs HTTP/3: HTTP/1.1 suffers from Head-of-Line (HoL) blocking at application level. HTTP/2 introduces binary framing and stream multiplexing over a single TCP connection (but HoL blocking at TCP layer on packet loss). HTTP/3 replaces TCP with QUIC over UDP, completely eliminating TCP HoL blocking.',
+              'WebSocket: Full-duplex bidirectional persistent connection established via HTTP Upgrade handshake (ws://, wss://). Ideal for real-time chat, live feeds, and multiplayer games.',
+              'TLS 1.3 Handshake: Reduced from 2 Round Trip Times (RTT) in TLS 1.2 down to 1-RTT (or 0-RTT resumption), encrypting earlier and dropping obsolete insecure ciphers.'
+            ]
           }
         ],
         quizQuestions: [
@@ -383,6 +546,20 @@ export const PREP_DATA = {
             options: ['HTTP', 'DNS', 'SSH', 'SMTP'],
             correctIndex: 1,
             explanation: 'DNS (Domain Name System) uses UDP port 53 for standard name queries due to UDP’s fast, low-overhead nature (TCP port 53 is used for zone transfers and responses exceeding 512 bytes).'
+          },
+          {
+            id: 'q_cn_3',
+            question: 'How many usable host IP addresses are available in a subnet with CIDR prefix /27?',
+            options: ['32', '30', '62', '14'],
+            correctIndex: 1,
+            explanation: 'Host bits = 32 - 27 = 5. Total IP addresses = 2^5 = 32. Subtracting 2 (one for Network ID, one for Broadcast ID) yields 30 usable host IP addresses.'
+          },
+          {
+            id: 'q_cn_4',
+            question: 'What transport-layer protocol does HTTP/3 utilize to eliminate Head-of-Line (HoL) blocking?',
+            options: ['TCP with SACK', 'QUIC over UDP', 'SCTP', 'Raw IP Datagrams'],
+            correctIndex: 1,
+            explanation: 'HTTP/3 runs over QUIC (Quick UDP Internet Connections), which provides built-in TLS 1.3 encryption and independent stream multiplexing on top of UDP, ensuring that packet loss on one stream does not pause other streams.'
           }
         ]
       },
@@ -412,6 +589,24 @@ export const PREP_DATA = {
               'Database Sharding & Replication: Master-Slave for read scaling; Horizontal partitioning (sharding) for write scaling.',
               'Message Queues (Kafka, RabbitMQ): Asynchronous background processing, decoupled services, rate-smoothing.'
             ]
+          },
+          {
+            topic: 'Gang of Four (GoF) Core Design Patterns',
+            summary: 'Standard battle-tested object-oriented design patterns with real-world software examples.',
+            keyPoints: [
+              'Creational: Singleton (single instance, thread-safe with double-checked locking), Factory Method (instantiates derived objects without exposing creation logic), Builder (constructs complex objects step-by-step).',
+              'Structural: Adapter (translates incompatible interface into client expected interface), Decorator (attaches responsibilities to objects dynamically without subclassing), Facade (simplified interface to a complex subsystem).',
+              'Behavioral: Observer (pub-sub state change notification to listeners, e.g. React events, RxJS), Strategy (interchangeable algorithms selected at runtime, e.g. PaymentStrategy), Command (encapsulates request as an object).'
+            ]
+          },
+          {
+            topic: 'Distributed Caching, CDN & Event-Driven Architecture',
+            summary: 'High-throughput architecture patterns, caching topologies, and message brokers.',
+            keyPoints: [
+              'Caching Strategies: Cache-Aside (Lazy loading: application checks cache, on miss reads DB and writes to cache), Write-Through (writes to cache and DB synchronously), Write-Back / Write-Behind (writes to cache immediately, async flush to DB).',
+              'Cache Anomalies: Cache Penetration (queries for non-existent keys bypass cache, solved by Bloom filters), Cache Breakdown (hot key expires, massive concurrent DB hits, solved by mutex lock on reload), Cache Avalanche (many keys expire simultaneously, solved by random TTL jitter).',
+              'Message Brokers (Kafka vs RabbitMQ): Kafka is a distributed commit log with partition ordering and replayability; RabbitMQ is an AMQP broker with flexible routing exchanges and consumer push queues.'
+            ]
           }
         ],
         quizQuestions: [
@@ -421,6 +616,25 @@ export const PREP_DATA = {
             options: ['Single Responsibility', 'Open-Closed', 'Liskov Substitution', 'Interface Segregation'],
             correctIndex: 2,
             explanation: 'Liskov Substitution Principle (LSP) ensures that any child class can replace its parent class without breaking client expectations.'
+          },
+          {
+            id: 'q_oop_2',
+            question: 'Which design pattern is best suited when you need to dynamically add behavior or responsibilities to an object at runtime without altering existing code or using subclass explosion?',
+            options: ['Decorator Pattern', 'Singleton Pattern', 'Factory Method', 'Adapter Pattern'],
+            correctIndex: 0,
+            explanation: 'The Decorator pattern wraps an object in decorator classes that implement the same interface, dynamically layering new behaviors at runtime without subclass explosion (e.g. Java I/O streams like BufferedReader(new FileReader(...))).'
+          },
+          {
+            id: 'q_oop_3',
+            question: 'In high-scale caching architectures, what is the best strategy to prevent a "Cache Avalanche" where thousands of cache keys expire at the exact same second?',
+            options: [
+              'Disable TTL entirely on all cached records',
+              'Add a randomized jitter / delta to the expiration TTL of each key',
+              'Route all traffic directly to the database replica',
+              'Store all cached values exclusively in client cookies'
+            ],
+            correctIndex: 1,
+            explanation: 'Adding random jitter to TTL values (e.g. base TTL + random(1 to 300) seconds) staggers key expiration over time, preventing mass simultaneous cache misses and subsequent database overload.'
           }
         ]
       }

@@ -84,6 +84,26 @@ export function arrayToTree(arr) {
   return root;
 }
 
+export function treeToArray(root) {
+  if (!root) return [];
+  const res = [];
+  const queue = [root];
+  while (queue.length > 0) {
+    const node = queue.shift();
+    if (node) {
+      res.push(node.val);
+      queue.push(node.left);
+      queue.push(node.right);
+    } else {
+      res.push(null);
+    }
+  }
+  while (res.length > 0 && res[res.length - 1] === null) {
+    res.pop();
+  }
+  return res;
+}
+
 // Deep equality comparator
 export function deepEqual(a, b) {
   if (a === b) return true;
@@ -588,6 +608,396 @@ export const DSA_TEST_SUITES = {
         validate: (result) => result === 0
       }
     ]
+  },
+
+  dsa_19: {
+    fnName: 'isAnagram',
+    description: 'Given two strings <code>s</code> and <code>t</code>, return <code>true</code> if <code>t</code> is an anagram of <code>s</code>, and <code>false</code> otherwise.<br/><br/>An <strong>Anagram</strong> is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.',
+    signatureHint: 'function isAnagram(s, t) {\n    // Return boolean (true / false)\n}',
+    testCases: [
+      {
+        args: ['anagram', 'nagaram'],
+        displayInput: 's = "anagram", t = "nagaram"',
+        expectedDisplay: 'true',
+        validate: (result) => result === true
+      },
+      {
+        args: ['rat', 'car'],
+        displayInput: 's = "rat", t = "car"',
+        expectedDisplay: 'false',
+        validate: (result) => result === false
+      },
+      {
+        args: ['a', 'ab'],
+        displayInput: 's = "a", t = "ab"',
+        expectedDisplay: 'false',
+        validate: (result) => result === false
+      }
+    ]
+  },
+
+  dsa_20: {
+    fnName: 'search',
+    description: 'Given an array of integers <code>nums</code> which is sorted in ascending order, and an integer <code>target</code>, write a function to search <code>target</code> in <code>nums</code>. If <code>target</code> exists, then return its index. Otherwise, return <code>-1</code>.<br/><br/>You must write an algorithm with <code>O(log n)</code> runtime complexity.',
+    signatureHint: 'function search(nums, target) {\n    // Return target index or -1\n}',
+    testCases: [
+      {
+        args: [[-1, 0, 3, 5, 9, 12], 9],
+        displayInput: 'nums = [-1,0,3,5,9,12], target = 9',
+        expectedDisplay: '4',
+        validate: (result) => result === 4
+      },
+      {
+        args: [[-1, 0, 3, 5, 9, 12], 2],
+        displayInput: 'nums = [-1,0,3,5,9,12], target = 2',
+        expectedDisplay: '-1',
+        validate: (result) => result === -1
+      },
+      {
+        args: [[5], 5],
+        displayInput: 'nums = [5], target = 5',
+        expectedDisplay: '0',
+        validate: (result) => result === 0
+      }
+    ]
+  },
+
+  dsa_21: {
+    fnName: 'invertTree',
+    description: 'Given the <code>root</code> of a binary tree, invert the tree, and return <em>its root</em>.',
+    signatureHint: 'function invertTree(root) {\n    // Return root of inverted binary tree\n}',
+    testCases: [
+      {
+        setup: () => arrayToTree([4, 2, 7, 1, 3, 6, 9]),
+        displayInput: 'root = [4, 2, 7, 1, 3, 6, 9]',
+        expectedDisplay: '[4, 7, 2, 9, 6, 3, 1]',
+        validate: (resRoot) => deepEqual(treeToArray(resRoot), [4, 7, 2, 9, 6, 3, 1])
+      },
+      {
+        setup: () => arrayToTree([2, 1, 3]),
+        displayInput: 'root = [2, 1, 3]',
+        expectedDisplay: '[2, 3, 1]',
+        validate: (resRoot) => deepEqual(treeToArray(resRoot), [2, 3, 1])
+      },
+      {
+        setup: () => arrayToTree([]),
+        displayInput: 'root = []',
+        expectedDisplay: '[]',
+        validate: (resRoot) => deepEqual(treeToArray(resRoot), [])
+      }
+    ]
+  },
+
+  dsa_22: {
+    fnName: 'mergeTwoLists',
+    description: 'You are given the heads of two sorted linked lists <code>list1</code> and <code>list2</code>.<br/><br/>Merge the two lists into one <strong>sorted</strong> list. The list should be made by splicing together the nodes of the first two lists. Return <em>the head of the merged linked list</em>.',
+    signatureHint: 'function mergeTwoLists(list1, list2) {\n    // Return head of merged linked list\n}',
+    testCases: [
+      {
+        setup: () => [arrayToList([1, 2, 4]), arrayToList([1, 3, 4])],
+        displayInput: 'list1 = [1,2,4], list2 = [1,3,4]',
+        expectedDisplay: '[1, 1, 2, 3, 4, 4]',
+        validate: (resHead) => deepEqual(listToArray(resHead), [1, 1, 2, 3, 4, 4])
+      },
+      {
+        setup: () => [arrayToList([]), arrayToList([])],
+        displayInput: 'list1 = [], list2 = []',
+        expectedDisplay: '[]',
+        validate: (resHead) => deepEqual(listToArray(resHead), [])
+      },
+      {
+        setup: () => [arrayToList([]), arrayToList([0])],
+        displayInput: 'list1 = [], list2 = [0]',
+        expectedDisplay: '[0]',
+        validate: (resHead) => deepEqual(listToArray(resHead), [0])
+      }
+    ]
+  },
+
+  dsa_23: {
+    fnName: 'longestPalindrome',
+    description: 'Given a string <code>s</code>, return <em>the longest palindromic substring</em> in <code>s</code>.',
+    signatureHint: 'function longestPalindrome(s) {\n    // Return longest palindromic substring\n}',
+    testCases: [
+      {
+        args: ['babad'],
+        displayInput: 's = "babad"',
+        expectedDisplay: '"bab" or "aba"',
+        validate: (result) => result === 'bab' || result === 'aba'
+      },
+      {
+        args: ['cbbd'],
+        displayInput: 's = "cbbd"',
+        expectedDisplay: '"bb"',
+        validate: (result) => result === 'bb'
+      },
+      {
+        args: ['a'],
+        displayInput: 's = "a"',
+        expectedDisplay: '"a"',
+        validate: (result) => result === 'a'
+      }
+    ]
+  },
+
+  dsa_24: {
+    fnName: 'MinStack',
+    description: 'Design a stack that supports <code>push</code>, <code>pop</code>, <code>top</code>, and retrieving the minimum element in <strong>constant time O(1)</strong>.<br/><br/>Implement the <code>MinStack</code> class with <code>push(val)</code>, <code>pop()</code>, <code>top()</code>, and <code>getMin()</code> methods.',
+    signatureHint: 'var MinStack = function() {\n    // Initialize your data structure here\n};\nMinStack.prototype.push = function(val) {};\nMinStack.prototype.pop = function() {};\nMinStack.prototype.top = function() {};\nMinStack.prototype.getMin = function() {};',
+    testCases: [
+      {
+        args: [
+          ['push', 'push', 'push', 'getMin', 'pop', 'top', 'getMin'],
+          [[-2], [0], [-3], [], [], [], []]
+        ],
+        displayInput: '["MinStack","push(-2)","push(0)","push(-3)","getMin()","pop()","top()","getMin()"]',
+        expectedDisplay: '[null, null, null, -3, null, 0, -2]',
+        validate: (result) => deepEqual(result, [null, null, null, -3, null, 0, -2])
+      },
+      {
+        args: [
+          ['push', 'push', 'getMin'],
+          [[1], [2], []]
+        ],
+        displayInput: '["MinStack","push(1)","push(2)","getMin()"]',
+        expectedDisplay: '[null, null, 1]',
+        validate: (result) => deepEqual(result, [null, null, 1])
+      }
+    ]
+  },
+
+  dsa_25: {
+    fnName: 'canFinish',
+    description: 'There are a total of <code>numCourses</code> courses you have to take, labeled from <code>0</code> to <code>numCourses - 1</code>. You are given an array <code>prerequisites</code> where <code>prerequisites[i] = [a_i, b_i]</code> indicates that you <strong>must</strong> take course <code>b_i</code> first if you want to take course <code>a_i</code>.<br/><br/>Return <code>true</code> if you can finish all courses. Otherwise, return <code>false</code>.',
+    signatureHint: 'function canFinish(numCourses, prerequisites) {\n    // Return boolean (true / false)\n}',
+    testCases: [
+      {
+        args: [2, [[1, 0]]],
+        displayInput: 'numCourses = 2, prerequisites = [[1,0]]',
+        expectedDisplay: 'true',
+        validate: (result) => result === true
+      },
+      {
+        args: [2, [[1, 0], [0, 1]]],
+        displayInput: 'numCourses = 2, prerequisites = [[1,0],[0,1]]',
+        expectedDisplay: 'false',
+        validate: (result) => result === false
+      },
+      {
+        args: [3, [[1, 0], [2, 1]]],
+        displayInput: 'numCourses = 3, prerequisites = [[1,0],[2,1]]',
+        expectedDisplay: 'true',
+        validate: (result) => result === true
+      }
+    ]
+  },
+
+  dsa_26: {
+    fnName: 'levelOrder',
+    description: 'Given the <code>root</code> of a binary tree, return <em>the level order traversal of its nodes\' values</em>. (i.e., from left to right, level by level).',
+    signatureHint: 'function levelOrder(root) {\n    // Return 2D array: [[level0], [level1], ...]\n}',
+    testCases: [
+      {
+        setup: () => arrayToTree([3, 9, 20, null, null, 15, 7]),
+        displayInput: 'root = [3, 9, 20, null, null, 15, 7]',
+        expectedDisplay: '[[3], [9, 20], [15, 7]]',
+        validate: (result) => deepEqual(result, [[3], [9, 20], [15, 7]])
+      },
+      {
+        setup: () => arrayToTree([1]),
+        displayInput: 'root = [1]',
+        expectedDisplay: '[[1]]',
+        validate: (result) => deepEqual(result, [[1]])
+      },
+      {
+        setup: () => arrayToTree([]),
+        displayInput: 'root = []',
+        expectedDisplay: '[]',
+        validate: (result) => deepEqual(result, [])
+      }
+    ]
+  },
+
+  dsa_27: {
+    fnName: 'lengthOfLIS',
+    description: 'Given an integer array <code>nums</code>, return <em>the length of the longest strictly increasing subsequence</em>.',
+    signatureHint: 'function lengthOfLIS(nums) {\n    // Return length (integer)\n}',
+    testCases: [
+      {
+        args: [[10, 9, 2, 5, 3, 7, 101, 18]],
+        displayInput: 'nums = [10,9,2,5,3,7,101,18]',
+        expectedDisplay: '4',
+        validate: (result) => result === 4
+      },
+      {
+        args: [[0, 1, 0, 3, 2, 3]],
+        displayInput: 'nums = [0,1,0,3,2,3]',
+        expectedDisplay: '4',
+        validate: (result) => result === 4
+      },
+      {
+        args: [[7, 7, 7, 7, 7, 7, 7]],
+        displayInput: 'nums = [7,7,7,7,7,7,7]',
+        expectedDisplay: '1',
+        validate: (result) => result === 1
+      }
+    ]
+  },
+
+  dsa_28: {
+    fnName: 'trap',
+    description: 'Given <code>n</code> non-negative integers representing an elevation map where the width of each bar is <code>1</code>, compute how much water it can trap after raining.',
+    signatureHint: 'function trap(height) {\n    // Return total trapped water (integer)\n}',
+    testCases: [
+      {
+        args: [[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]],
+        displayInput: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]',
+        expectedDisplay: '6',
+        validate: (result) => result === 6
+      },
+      {
+        args: [[4, 2, 0, 3, 2, 5]],
+        displayInput: 'height = [4,2,0,3,2,5]',
+        expectedDisplay: '9',
+        validate: (result) => result === 9
+      },
+      {
+        args: [[4, 2, 3]],
+        displayInput: 'height = [4,2,3]',
+        expectedDisplay: '1',
+        validate: (result) => result === 1
+      }
+    ]
+  },
+
+  dsa_29: {
+    fnName: 'largestRectangleArea',
+    description: 'Given an array of integers <code>heights</code> representing the histogram\'s bar height where the width of each bar is <code>1</code>, return <em>the area of the largest rectangle in the histogram</em>.',
+    signatureHint: 'function largestRectangleArea(heights) {\n    // Return maximum rectangle area (integer)\n}',
+    testCases: [
+      {
+        args: [[2, 1, 5, 6, 2, 3]],
+        displayInput: 'heights = [2,1,5,6,2,3]',
+        expectedDisplay: '10',
+        validate: (result) => result === 10
+      },
+      {
+        args: [[2, 4]],
+        displayInput: 'heights = [2,4]',
+        expectedDisplay: '4',
+        validate: (result) => result === 4
+      },
+      {
+        args: [[1, 1]],
+        displayInput: 'heights = [1,1]',
+        expectedDisplay: '2',
+        validate: (result) => result === 2
+      }
+    ]
+  },
+
+  dsa_30: {
+    fnName: 'mergeKLists',
+    description: 'You are given an array of <code>k</code> linked-lists <code>lists</code>, each linked-list is sorted in ascending order.<br/><br/><em>Merge all the linked-lists into one sorted linked-list and return it.</em>',
+    signatureHint: 'function mergeKLists(lists) {\n    // Return head of merged sorted linked list\n}',
+    testCases: [
+      {
+        setup: () => [[arrayToList([1, 4, 5]), arrayToList([1, 3, 4]), arrayToList([2, 6])]],
+        displayInput: 'lists = [[1,4,5],[1,3,4],[2,6]]',
+        expectedDisplay: '[1, 1, 2, 3, 4, 4, 5, 6]',
+        validate: (resHead) => deepEqual(listToArray(resHead), [1, 1, 2, 3, 4, 4, 5, 6])
+      },
+      {
+        setup: () => [[]],
+        displayInput: 'lists = []',
+        expectedDisplay: '[]',
+        validate: (resHead) => deepEqual(listToArray(resHead), [])
+      },
+      {
+        setup: () => [[arrayToList([])]],
+        displayInput: 'lists = [[]]',
+        expectedDisplay: '[]',
+        validate: (resHead) => deepEqual(listToArray(resHead), [])
+      }
+    ]
+  },
+
+  dsa_31: {
+    fnName: 'findMedianSortedArrays',
+    description: 'Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return <strong>the median</strong> of the two sorted arrays.<br/><br/>The overall run time complexity should be <code>O(log (m+n))</code>.',
+    signatureHint: 'function findMedianSortedArrays(nums1, nums2) {\n    // Return median (float / number)\n}',
+    testCases: [
+      {
+        args: [[1, 3], [2]],
+        displayInput: 'nums1 = [1,3], nums2 = [2]',
+        expectedDisplay: '2.0',
+        validate: (result) => Math.abs(result - 2.0) < 1e-5
+      },
+      {
+        args: [[1, 2], [3, 4]],
+        displayInput: 'nums1 = [1,2], nums2 = [3,4]',
+        expectedDisplay: '2.5',
+        validate: (result) => Math.abs(result - 2.5) < 1e-5
+      },
+      {
+        args: [[0, 0], [0, 0]],
+        displayInput: 'nums1 = [0,0], nums2 = [0,0]',
+        expectedDisplay: '0.0',
+        validate: (result) => Math.abs(result - 0.0) < 1e-5
+      }
+    ]
+  },
+
+  dsa_32: {
+    fnName: 'ladderLength',
+    description: 'A <strong>transformation sequence</strong> from word <code>beginWord</code> to word <code>endWord</code> using a dictionary <code>wordList</code> is a sequence of words <code>beginWord -> s_1 -> s_2 -> ... -> s_k</code> such that every adjacent pair of words differs by a single letter, and <code>s_k == endWord</code>.<br/><br/>Given two words, <code>beginWord</code> and <code>endWord</code>, and a dictionary <code>wordList</code>, return <em>the <strong>number of words</strong> in the shortest transformation sequence from <code>beginWord</code> to <code>endWord</code>, or <code>0</code> if no such sequence exists.</em>',
+    signatureHint: 'function ladderLength(beginWord, endWord, wordList) {\n    // Return transformation count or 0\n}',
+    testCases: [
+      {
+        args: ['hit', 'cog', ['hot', 'dot', 'dog', 'lot', 'log', 'cog']],
+        displayInput: 'begin = "hit", end = "cog", list = ["hot","dot","dog","lot","log","cog"]',
+        expectedDisplay: '5',
+        validate: (result) => result === 5
+      },
+      {
+        args: ['hit', 'cog', ['hot', 'dot', 'dog', 'lot', 'log']],
+        displayInput: 'begin = "hit", end = "cog", list = ["hot","dot","dog","lot","log"]',
+        expectedDisplay: '0',
+        validate: (result) => result === 0
+      },
+      {
+        args: ['a', 'c', ['a', 'b', 'c']],
+        displayInput: 'begin = "a", end = "c", list = ["a","b","c"]',
+        expectedDisplay: '2',
+        validate: (result) => result === 2
+      }
+    ]
+  },
+
+  dsa_33: {
+    fnName: 'minDistance',
+    description: 'Given two strings <code>word1</code> and <code>word2</code>, return <em>the minimum number of operations required to convert <code>word1</code> to <code>word2</code></em>.<br/><br/>You have the following three operations permitted on a word: Insert a character, Delete a character, Replace a character.',
+    signatureHint: 'function minDistance(word1, word2) {\n    // Return minimum edit operations (integer)\n}',
+    testCases: [
+      {
+        args: ['horse', 'ros'],
+        displayInput: 'word1 = "horse", word2 = "ros"',
+        expectedDisplay: '3',
+        validate: (result) => result === 3
+      },
+      {
+        args: ['intention', 'execution'],
+        displayInput: 'word1 = "intention", word2 = "execution"',
+        expectedDisplay: '5',
+        validate: (result) => result === 5
+      },
+      {
+        args: ['', 'a'],
+        displayInput: 'word1 = "", word2 = "a"',
+        expectedDisplay: '1',
+        validate: (result) => result === 1
+      }
+    ]
   }
 };
 
@@ -623,6 +1033,18 @@ export function runJsTestCases(userCode, problemId) {
       ${userCode}
 
       try {
+        if (typeof MinStack === 'function' && '${suite.fnName}' === 'MinStack') {
+          return function(ops, vals) {
+            const ms = new MinStack();
+            return ops.map((op, i) => {
+              if (op === 'push') { ms.push(vals[i][0]); return null; }
+              if (op === 'pop') { ms.pop(); return null; }
+              if (op === 'top') return ms.top();
+              if (op === 'getMin') return ms.getMin();
+              return null;
+            });
+          };
+        }
         if (typeof ${suite.fnName} === 'function') return ${suite.fnName};
       } catch(e) {}
 
