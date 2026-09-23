@@ -75,14 +75,12 @@ class AuthController {
     const registerForm = document.getElementById('form-signup');
     const titleEl = document.getElementById('auth-title');
     const subtitleEl = document.getElementById('auth-subtitle');
-    const demoStrip = document.getElementById('demo-accounts-strip');
 
     if (tab === 'login') {
       loginTabBtn?.classList.add('active');
       registerTabBtn?.classList.remove('active');
       if (loginForm) loginForm.style.display = 'flex';
       if (registerForm) registerForm.style.display = 'none';
-      if (demoStrip) demoStrip.style.display = 'flex';
 
       if (titleEl) titleEl.textContent = 'Welcome Back';
       if (subtitleEl) subtitleEl.textContent = 'Access your career dashboard, tracked jobs, and interview prep.';
@@ -91,7 +89,6 @@ class AuthController {
       loginTabBtn?.classList.remove('active');
       if (loginForm) loginForm.style.display = 'none';
       if (registerForm) registerForm.style.display = 'flex';
-      if (demoStrip) demoStrip.style.display = 'none';
 
       if (titleEl) titleEl.textContent = 'Create Your Account';
       if (subtitleEl) subtitleEl.textContent = 'Join thousands of engineers accelerating their careers Zero to Hero.';
@@ -106,15 +103,6 @@ class AuthController {
     // Tab buttons
     document.getElementById('tab-btn-login')?.addEventListener('click', () => this.switchTab('login'));
     document.getElementById('tab-btn-register')?.addEventListener('click', () => this.switchTab('register'));
-
-    // Demo Fill Buttons
-    document.getElementById('btn-demo-candidate')?.addEventListener('click', () => {
-      this.fillDemoCandidate();
-    });
-
-    document.getElementById('btn-demo-recruiter')?.addEventListener('click', () => {
-      this.fillDemoRecruiter();
-    });
 
     // Password Toggles
     document.querySelectorAll('.btn-toggle-pwd').forEach(btn => {
@@ -228,24 +216,6 @@ class AuthController {
       if (banner) banner.style.display = 'none';
       this.showToast('Signed out of current session', 'info');
     });
-  }
-
-  fillDemoCandidate() {
-    this.switchTab('login');
-    const emailEl = document.getElementById('signin-email');
-    const pwdEl = document.getElementById('signin-password');
-    if (emailEl) emailEl.value = 'sachin.candidate@skhire.dev';
-    if (pwdEl) pwdEl.value = 'Candidate#2026';
-    this.showToast('Autofilled Candidate demo credentials!', 'info');
-  }
-
-  fillDemoRecruiter() {
-    this.switchTab('login');
-    const emailEl = document.getElementById('signin-email');
-    const pwdEl = document.getElementById('signin-password');
-    if (emailEl) emailEl.value = 'priya.recruiter@techcorp.io';
-    if (pwdEl) pwdEl.value = 'Recruiter#2026';
-    this.showToast('Autofilled Recruiter demo credentials!', 'info');
   }
 
   evaluatePasswordStrength(password) {
