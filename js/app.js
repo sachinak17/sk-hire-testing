@@ -129,7 +129,9 @@ class App {
 
     // Update active state in nav
     document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.toggle('active', item.dataset.view === viewName);
+      const isActive = item.dataset.view === viewName;
+      item.classList.toggle('active', isActive);
+      item.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
 
     // Show active section

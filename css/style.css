@@ -56,11 +56,22 @@
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.7);
   --shadow-glow: 0 0 40px -10px rgba(56, 189, 248, 0.45);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  /* Standardized Corner Radii (4-tier system) */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
+
+  /* Standardized Modular Type Scale Tokens */
+  --text-xs: 0.75rem;    /* 12px - Badges, tags, micro-labels */
+  --text-sm: 0.875rem;   /* 14px - Meta items, pills, secondary copy */
+  --text-base: 1rem;     /* 16px - Base body text */
+  --text-md: 1.125rem;   /* 18px - Subheadings, emphasis */
+  --text-lg: 1.25rem;    /* 20px - Job titles, card headings */
+  --text-xl: 1.5rem;     /* 24px - Section sub-headers */
+  --text-2xl: 1.75rem;   /* 28px - Section H2 headers */
+  --text-3xl: 2.5rem;    /* 40px - Hero H1 header */
 
   --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -326,11 +337,11 @@ body::after {
   padding: 8px 18px;
   border-radius: var(--radius-full);
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   transition: all var(--transition-fast);
   position: relative;
@@ -342,9 +353,19 @@ body::after {
 }
 
 .nav-item.active {
-  background: var(--gradient-cta);
-  color: #ffffff;
-  box-shadow: 0 4px 18px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: var(--bg-surface-elevated);
+  color: var(--primary);
+  border-color: var(--border-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .nav-actions {
@@ -457,6 +478,15 @@ body:not([data-active-view="jobs"]) .hero-banner {
   transition: all var(--transition-bounce);
   position: relative;
   overflow: hidden;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stat-chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .stat-chip::before {
@@ -478,6 +508,24 @@ body:not([data-active-view="jobs"]) .hero-banner {
 
 .stat-chip:hover::before {
   background: var(--gradient-card-top);
+}
+
+.stat-action-arrow {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--primary);
+  opacity: 0.85;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.stat-chip:hover .stat-action-arrow {
+  opacity: 1;
+  transform: translateX(4px);
 }
 
 .stat-icon-wrapper {
@@ -543,8 +591,15 @@ body:not([data-active-view="jobs"]) .hero-banner {
   gap: 16px;
 }
 
+.heading-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .section-heading-group h2 {
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
   font-weight: 800;
   letter-spacing: -0.02em;
   display: flex;

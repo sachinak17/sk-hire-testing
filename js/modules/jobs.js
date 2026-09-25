@@ -59,10 +59,15 @@ export class JobsModule {
     const pillContainer = document.getElementById('job-domain-pills');
     if (pillContainer) {
       pillContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('pill-btn')) {
-          pillContainer.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
-          e.target.classList.add('active');
-          this.activeFilters.domain = e.target.dataset.domain;
+        const btn = e.target.closest('.pill-btn');
+        if (btn) {
+          pillContainer.querySelectorAll('.pill-btn').forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-pressed', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-pressed', 'true');
+          this.activeFilters.domain = btn.dataset.domain;
           this.render();
         }
       });
@@ -145,8 +150,15 @@ export class JobsModule {
           if (expFilter) expFilter.value = 'all';
           const pillContainer = document.getElementById('job-domain-pills');
           if (pillContainer) {
-            pillContainer.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
-            pillContainer.querySelector('[data-domain="all"]')?.classList.add('active');
+            pillContainer.querySelectorAll('.pill-btn').forEach(btn => {
+              btn.classList.remove('active');
+              btn.setAttribute('aria-pressed', 'false');
+            });
+            const allBtn = pillContainer.querySelector('[data-domain="all"]');
+            if (allBtn) {
+              allBtn.classList.add('active');
+              allBtn.setAttribute('aria-pressed', 'true');
+            }
           }
           this.render();
         });
@@ -165,7 +177,7 @@ export class JobsModule {
               <div class="company-logo">${job.logo || '🏢'}</div>
               <div>
                 <span class="job-company-name">${job.company}</span>
-                <h4 class="job-role-title">${job.title}</h4>
+                <h3 class="job-role-title">${job.title}</h3>
               </div>
             </div>
             <button class="bookmark-btn ${isSaved ? 'bookmarked' : ''}" title="${isSaved ? 'Remove Bookmark' : 'Save Job'}" data-save-job="${job.id}">

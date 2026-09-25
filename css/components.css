@@ -53,20 +53,36 @@
 .filters-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
-  align-items: center;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
 }
 
 .filter-select {
-  padding: 11px 18px;
+  height: 38px;
+  padding: 0 32px 0 14px;
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 0.88rem;
+  font-size: var(--text-sm, 0.875rem);
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+  box-sizing: border-box;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-sm);
 }
@@ -84,21 +100,48 @@
 }
 
 .pill-btn {
+  height: 38px;
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: 0.84rem;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm, 0.875rem);
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   cursor: pointer;
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
 .pill-btn:hover {
   background: var(--bg-surface-hover);
   color: var(--text-primary);
-  background: var(--bg-surface);
+  border-color: var(--border-accent);
+}
+
+.pill-btn.active {
+  background: var(--primary);
+  color: var(--text-inverse);
+  border-color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 2px 10px var(--primary-glow);
+}
+
+#jobs-count-badge {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--primary);
+  border: 1px solid var(--border-accent);
+  box-shadow: none;
+  pointer-events: none;
 }
 
 /* Filter Strip */
@@ -296,17 +339,22 @@
   margin-bottom: 20px;
 }
 
+.skill-tag,
 .job-tag {
-  font-size: 0.76rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xs, 0.75rem);
   font-weight: 600;
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  padding: 3px 9px;
+  border-radius: var(--radius-sm, 6px);
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
+.skill-tag:hover,
 .job-tag:hover {
   border-color: var(--border-accent);
   color: var(--text-primary);
@@ -324,29 +372,42 @@
 }
 
 .salary-tag {
-  font-size: 1.08rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #34d399 0%, #38bdf8 55%, #60a5fa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+  font-size: var(--text-base, 1rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: initial;
+  filter: none;
+  letter-spacing: -0.01em;
 }
 
 .job-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .btn-details {
-  padding: 9px 16px;
-  font-size: 0.86rem;
+  min-width: 92px;
+  height: 38px;
+  padding: 0 14px;
+  font-size: var(--text-sm, 0.86rem);
   font-weight: 600;
   border-radius: var(--radius-md);
+  box-sizing: border-box;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-apply {
-  padding: 9px 18px;
-  font-size: 0.86rem;
+  min-width: 96px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: var(--text-sm, 0.86rem);
   font-weight: 700;
   border-radius: var(--radius-md);
   background: var(--gradient-cta);
@@ -354,6 +415,11 @@
   border: none;
   box-shadow: 0 4px 14px var(--primary-glow);
   cursor: pointer;
+  box-sizing: border-box;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all var(--transition-fast);
 }
 
