@@ -391,11 +391,56 @@
           </div>
 
           <div style="margin-bottom: 14px;">
-            <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Upload Resume (PDF/DOCX)</label>
-            <div style="border: 2px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 20px; text-align: center; background: var(--bg-surface-elevated); margin-top: 4px;">
-              <div style="font-size: 1.8rem; margin-bottom: 6px;">📄</div>
-              <input type="text" id="apply-resume-name" class="search-input" style="padding: 8px; text-align: center; font-size: 0.85rem;" value="JohnDoe_Resume_2026.pdf" />
-              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">Verified ATS-friendly resume format</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Upload Resume from Drive / Computer *</label>
+              <span style="font-size: 0.74rem; color: var(--text-muted);" id="apply-resume-format-hint">PDF, DOCX, TXT (Up to 10MB)</span>
+            </div>
+
+            <!-- Hidden File Input & Meta Data -->
+            <input type="file" id="apply-resume-file-input" accept=".pdf,.docx,.doc,.txt" style="display: none;" />
+            <input type="hidden" id="apply-resume-name" />
+            <input type="hidden" id="apply-resume-size" />
+            <input type="hidden" id="apply-resume-type" />
+
+            <!-- File Reading & Parsing Progress Indicator -->
+            <div id="apply-resume-progress" class="resume-parse-progress" style="display: none; align-items: center; gap: 10px; margin-bottom: 10px;">
+              <div class="parse-spinner"></div>
+              <div style="font-size: 0.84rem; color: var(--accent-cyan); font-weight: 600;" id="apply-resume-status-text">
+                Reading resume file from drive...
+              </div>
+            </div>
+
+            <!-- Uploaded File Card (Displayed when resume is attached) -->
+            <div id="apply-file-card" class="uploaded-file-card" style="display: none; margin-bottom: 0;">
+              <div class="file-card-left">
+                <span class="file-format-badge" id="apply-file-format-icon">📄 PDF</span>
+                <div>
+                  <div class="file-card-name" id="apply-file-card-name">Resume.pdf</div>
+                  <div class="file-card-meta" id="apply-file-card-meta">Uploaded from Drive • Attached to Application</div>
+                </div>
+              </div>
+              <div class="file-card-actions">
+                <span class="badge badge-success" style="font-size: 0.74rem; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 8px; border-radius: 6px;">✓ Attached</span>
+                <button type="button" class="btn btn-secondary" id="apply-btn-change-file" style="padding: 4px 10px; font-size: 0.78rem; height: 30px;">
+                  🔄 Change File
+                </button>
+              </div>
+            </div>
+
+            <!-- Interactive File Dropzone for Drive / Local Device -->
+            <div class="resume-upload-dropzone" id="apply-resume-dropzone" style="border: 2px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 22px 16px; text-align: center; background: var(--bg-surface-elevated); cursor: pointer; transition: all var(--transition-fast);">
+              <div class="dropzone-inner">
+                <div style="font-size: 2rem; margin-bottom: 4px;">📂</div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+                  Click or Drag & Drop Resume from Drive
+                </h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">
+                  Upload your real resume from your local drive or disk (.PDF, .DOCX, .TXT)
+                </p>
+                <button type="button" class="btn btn-secondary" id="apply-btn-browse" style="font-size: 0.82rem; padding: 6px 16px; height: 32px; border-color: var(--primary); pointer-events: none;">
+                  📁 Browse from Drive / Device
+                </button>
+              </div>
             </div>
           </div>
         </div>

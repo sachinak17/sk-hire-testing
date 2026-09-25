@@ -88,6 +88,9 @@ export class JobsModule {
       applyForm.addEventListener('submit', (e) => this.handleApplySubmit(e));
     }
 
+    // Initialize resume upload from drive / computer
+    this.initApplyResumeUpload();
+
     // Subscribe to state changes
     state.subscribe((event) => {
       if (event === 'saved_jobs_change' || event === 'application_submitted' || event === 'custom_job_added' || event === 'state_reset') {
@@ -327,6 +330,205 @@ export class JobsModule {
     modal.classList.add('active');
   }
 
+  initApplyResumeUpload() {
+    const dropzone = document.getElementById('apply-resume-dropzone');
+    const fileInput = document.getElementById('apply-resume-file-input');
+    const changeBtn = document.getElementById('apply-btn-change-file');
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', (e) => {
+        if (e.target !== fileInput) {
+          fileInput.click();
+        }
+      });
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('drag-over');
+        });
+      });
+
+      ['dragleave', 'dragend'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('drag-over');
+        });
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('drag-over');
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          this.processApplyResumeFile(files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+          this.processApplyResumeFile(files[0]);
+        }
+      });
+    }
+
+    if (changeBtn && fileInput) {
+      changeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.click();
+      });
+    }
+  }
+
+  async processApplyResumeFile(file) {
+    if (!file) return;
+
+    const progressEl = document.getElementById('apply-resume-progress');
+    const statusText = document.getElementById('apply-resume-status-text');
+    const fileCard = document.getElementById('apply-file-card');
+    const dropzone = document.getElementById('apply-resume-dropzone');
+    const nameLabel = document.getElementById('apply-file-card-name');
+    const metaLabel = document.getElementById('apply-file-card-meta');
+    const formatIcon = document.getElementById('apply-file-format-icon');
+    const hiddenName = document.getElementById('apply-resume-name');
+    const hiddenSize = document.getElementById('apply-resume-size');
+    const hiddenType = document.getElementById('apply-resume-type');
+
+    if (progressEl) progressEl.style.display = 'flex';
+    if (statusText) statusText.textContent = `Reading "${file.name}" from your drive...`;
+
+    const sizeStr = this.formatFileSize(file.size);
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+
+    let fileTypeLabel = 'Document';
+    if (ext === 'pdf') fileTypeLabel = 'PDF Document';
+    else if (ext === 'docx' || ext === 'doc') fileTypeLabel = 'Word Document';
+    else if (ext === 'txt') fileTypeLabel = 'Plain Text';
+
+    try {
+      let extractedText = '';
+
+      if (ext === 'pdf') {
+        if (formatIcon) formatIcon.textContent = '📄 PDF';
+        if (statusText) statusText.textContent = 'Parsing PDF layers from drive...';
+        const buffer = await file.arrayBuffer();
+        extractedText = await this.extractPdfText(buffer);
+      } else if (ext === 'docx' || ext === 'doc') {
+        if (formatIcon) formatIcon.textContent = '📝 Word';
+        if (statusText) statusText.textContent = 'Extracting document text...';
+        const buffer = await file.arrayBuffer();
+        extractedText = await this.extractDocxText(buffer);
+      } else {
+        if (formatIcon) formatIcon.textContent = '📃 TXT';
+        if (statusText) statusText.textContent = 'Reading text content...';
+        const raw = await file.text();
+        extractedText = this.sanitizeResumeText(raw);
+      }
+
+      this.currentApplyFile = {
+        name: file.name,
+        size: sizeStr,
+        type: fileTypeLabel,
+        text: extractedText
+      };
+
+      if (hiddenName) hiddenName.value = file.name;
+      if (hiddenSize) hiddenSize.value = sizeStr;
+      if (hiddenType) hiddenType.value = fileTypeLabel;
+
+      if (nameLabel) nameLabel.textContent = file.name;
+      if (metaLabel) metaLabel.textContent = `${sizeStr} • Uploaded from Drive • Attached`;
+
+      if (dropzone) dropzone.style.display = 'none';
+      if (fileCard) fileCard.style.display = 'flex';
+      if (progressEl) progressEl.style.display = 'none';
+
+      // Automatically sync with candidate profile so Hire Score and ATS stay updated
+      state.updateResumeProfile({
+        fileName: file.name,
+        fileSize: sizeStr,
+        fileType: fileTypeLabel,
+        extractedText: extractedText || ''
+      });
+
+      this.app.showToast(`Real resume "${file.name}" uploaded from drive and attached!`, 'success');
+    } catch (err) {
+      console.error('Error processing resume file:', err);
+      if (progressEl) progressEl.style.display = 'none';
+      this.app.showToast(`Error reading file: ${err.message || 'Could not parse document'}`, 'error');
+    }
+  }
+
+  async extractPdfText(arrayBuffer) {
+    if (window.pdfjsLib) {
+      try {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/libs/pdf.worker.min.js';
+        const typedArray = new Uint8Array(arrayBuffer);
+        const loadingTask = window.pdfjsLib.getDocument({
+          data: typedArray,
+          useSystemFonts: true
+        });
+        const pdf = await loadingTask.promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent({ normalizeWhitespace: true });
+          let pageText = textContent.items.map(item => item?.str || '').join(' ');
+          fullText += pageText + '\n\n';
+        }
+        const cleaned = this.sanitizeResumeText(fullText);
+        if (cleaned && cleaned.trim().length > 15) return cleaned.trim();
+      } catch (err) {
+        console.warn('PDF.js parse warning:', err);
+      }
+    }
+    return this.cleanFallbackText(arrayBuffer);
+  }
+
+  async extractDocxText(arrayBuffer) {
+    if (window.mammoth) {
+      try {
+        const result = await window.mammoth.extractRawText({ arrayBuffer });
+        if (result.value && result.value.trim().length > 15) {
+          return this.sanitizeResumeText(result.value.trim());
+        }
+      } catch (err) {
+        console.warn('Mammoth parse warning:', err);
+      }
+    }
+    return this.cleanFallbackText(arrayBuffer);
+  }
+
+  sanitizeResumeText(text) {
+    if (!text) return '';
+    return text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFFFD]/g, '').trim();
+  }
+
+  cleanFallbackText(arrayBuffer) {
+    const bytes = new Uint8Array(arrayBuffer);
+    let extracted = '';
+    for (let i = 0; i < bytes.length; i++) {
+      const b = bytes[i];
+      if ((b >= 32 && b <= 126) || b === 10 || b === 13) {
+        extracted += String.fromCharCode(b);
+      }
+    }
+    return this.sanitizeResumeText(extracted);
+  }
+
+  formatFileSize(bytes) {
+    if (!bytes || bytes === 0) return '0 KB';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
   openApplyModal(jobId) {
     const job = this.getAllJobs().find(j => j.id === jobId);
     if (!job) return;
@@ -338,9 +540,48 @@ export class JobsModule {
     document.getElementById('apply-modal-title').textContent = `Easy Apply to ${job.company}`;
     document.getElementById('apply-modal-subtitle').textContent = `${job.title} • ${job.location}`;
 
-    const resumeNameEl = document.getElementById('apply-resume-name');
-    if (resumeNameEl && state.resumeProfile && state.resumeProfile.fileName) {
-      resumeNameEl.value = state.resumeProfile.fileName;
+    // Prefill user details if available
+    const nameEl = document.getElementById('apply-name');
+    const emailEl = document.getElementById('apply-email');
+    if (nameEl && !nameEl.value && state.currentUser?.name) {
+      nameEl.value = state.currentUser.name;
+    }
+    if (emailEl && !emailEl.value && state.currentUser?.email) {
+      emailEl.value = state.currentUser.email;
+    }
+
+    const dropzone = document.getElementById('apply-resume-dropzone');
+    const fileCard = document.getElementById('apply-file-card');
+    const nameLabel = document.getElementById('apply-file-card-name');
+    const metaLabel = document.getElementById('apply-file-card-meta');
+    const formatIcon = document.getElementById('apply-file-format-icon');
+    const hiddenName = document.getElementById('apply-resume-name');
+    const hiddenSize = document.getElementById('apply-resume-size');
+    const hiddenType = document.getElementById('apply-resume-type');
+
+    // Check if user already uploaded a resume in their profile or during current session
+    const existingFile = this.currentApplyFile || (state.resumeProfile && state.resumeProfile.fileName ? {
+      name: state.resumeProfile.fileName,
+      size: state.resumeProfile.fileSize || '142 KB',
+      type: state.resumeProfile.fileType || 'PDF Document'
+    } : null);
+
+    if (existingFile && existingFile.name) {
+      if (hiddenName) hiddenName.value = existingFile.name;
+      if (hiddenSize) hiddenSize.value = existingFile.size;
+      if (hiddenType) hiddenType.value = existingFile.type;
+      if (nameLabel) nameLabel.textContent = existingFile.name;
+      if (metaLabel) metaLabel.textContent = `${existingFile.size} • Attached from Profile / Drive`;
+      const ext = (existingFile.name.split('.').pop() || '').toLowerCase();
+      if (formatIcon) {
+        formatIcon.textContent = ext === 'pdf' ? '📄 PDF' : (ext.includes('doc') ? '📝 Word' : '📃 DOC');
+      }
+      if (dropzone) dropzone.style.display = 'none';
+      if (fileCard) fileCard.style.display = 'flex';
+    } else {
+      if (dropzone) dropzone.style.display = 'block';
+      if (fileCard) fileCard.style.display = 'none';
+      if (hiddenName) hiddenName.value = '';
     }
 
     modal.classList.add('active');
@@ -354,7 +595,19 @@ export class JobsModule {
     const phone = document.getElementById('apply-phone').value.trim();
     const experience = document.getElementById('apply-exp').value;
     const portfolio = document.getElementById('apply-portfolio').value.trim();
-    const resumeName = document.getElementById('apply-resume-name').value || 'Resume_Document.pdf';
+    const resumeName = document.getElementById('apply-resume-name')?.value?.trim();
+    const resumeSize = document.getElementById('apply-resume-size')?.value?.trim() || '142 KB';
+    const resumeType = document.getElementById('apply-resume-type')?.value?.trim() || 'PDF Document';
+
+    if (!resumeName) {
+      this.app.showToast('Please upload your resume from drive to complete your application!', 'warning');
+      const dropzone = document.getElementById('apply-resume-dropzone');
+      if (dropzone) {
+        dropzone.style.borderColor = 'var(--accent-rose)';
+        dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
 
     const job = this.getAllJobs().find(j => j.id === jobId);
     if (!job) return;
@@ -370,11 +623,13 @@ export class JobsModule {
       phone,
       experience,
       portfolio,
-      resumeName
+      resumeName,
+      resumeSize,
+      resumeType
     });
 
     this.closeModal('easy-apply-modal');
-    this.app.showToast(`Application successfully sent to ${job.company}!`, 'success');
+    this.app.showToast(`Application successfully sent to ${job.company} with resume "${resumeName}"!`, 'success');
     this.render();
   }
 

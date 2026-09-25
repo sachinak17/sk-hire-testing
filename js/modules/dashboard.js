@@ -506,7 +506,7 @@ export class DashboardModule {
                   <div>
                     <h5 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">${app.jobTitle}</h5>
                     <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
-                      ${app.company} • ${app.location} • Applied ${new Date(app.appliedAt).toLocaleDateString()}
+                      ${app.company} • ${app.location} • Applied ${new Date(app.appliedAt).toLocaleDateString()}${app.resumeName ? ` • 📄 <strong style="color: var(--primary);">${app.resumeName}</strong>` : ''}
                     </div>
                   </div>
                   <span class="stage-pill stage-${app.status}">${app.status}</span>
