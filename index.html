@@ -546,6 +546,7 @@
           <div>
             <h3 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">ATS Resume Audit & Drive Upload</h3>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Upload your real resume from drive/device to audit keywords, impact metrics, and ATS compatibility.</p>
+            <div id="resume-modal-user-notice" style="font-size: 0.78rem; color: var(--accent-cyan); margin-top: 4px; font-weight: 500;"></div>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="resume-modal">✕</button>
@@ -568,7 +569,7 @@
             </div>
             <div>
               <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 5px;">Resume Document Name</label>
-              <input type="text" id="resume-filename" class="search-input" style="padding: 10px 14px;" value="Sachin_AK_Resume.pdf" />
+              <input type="text" id="resume-filename" class="search-input" style="padding: 10px 14px;" placeholder="e.g. My_Resume.pdf" value="" />
             </div>
           </div>
 
@@ -636,8 +637,8 @@
             <div class="file-card-left">
               <span class="file-format-badge" id="file-format-icon">📄 PDF</span>
               <div>
-                <div class="file-card-name" id="file-card-name-label">Sachin_AK_Resume.pdf</div>
-                <div class="file-card-meta" id="file-card-meta-label">142 KB • Ready for ATS Evaluation</div>
+                <div class="file-card-name" id="file-card-name-label"></div>
+                <div class="file-card-meta" id="file-card-meta-label"></div>
               </div>
             </div>
             <div class="file-card-actions">
@@ -654,21 +655,10 @@
           <!-- Collapsible Extracted Resume Text Area -->
           <details class="resume-text-accordion" id="resume-text-details" style="margin-bottom: 16px;">
             <summary style="cursor: pointer; font-size: 0.84rem; font-weight: 600; color: var(--text-secondary); padding: 8px 0; user-select: none;">
-              <span>👁️ View / Refine Extracted Resume Text (<span id="resume-word-count-badge">85</span> words)</span>
+              <span>👁️ View / Refine Extracted Resume Text (<span id="resume-word-count-badge">0</span> words)</span>
             </summary>
             <div style="margin-top: 8px;">
-              <textarea id="resume-paste-text" class="search-input" rows="6" style="padding: 12px; font-size: 0.85rem; line-height: 1.5;" placeholder="Resume content will automatically appear here once uploaded from drive...">Sachin A K
-Email: sachin@candidate.com | Phone: +91 9876543210 | GitHub: https://github.com/sachinak | LinkedIn: https://linkedin.com/in/sachinak
-Target Role: Software Development Engineer
-
-TECHNICAL SKILLS:
-- Languages: JavaScript, Python, C++, TypeScript, SQL
-- Frameworks: React, Node.js, Express, Tailwind CSS
-- Databases & Tools: PostgreSQL, MongoDB, Redis, Docker, Git, RESTful APIs, Linux
-
-PROJECTS:
-- DevSphere: Developed real-time collaborative code editor serving 1,200+ users. Reduced latency by 35% using WebSocket connections.
-- HireMatrix: Architected job placement platform with ATS scanner, optimizing candidate shortlisting by 45%. Implemented robust authentication with bcrypt and JWT.</textarea>
+              <textarea id="resume-paste-text" class="search-input" rows="6" style="padding: 12px; font-size: 0.85rem; line-height: 1.5;" placeholder="Resume content will automatically appear here once uploaded from drive or computer, or paste your resume text here..."></textarea>
             </div>
           </details>
 
@@ -682,10 +672,10 @@ PROJECTS:
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
               <div>
                 <span style="font-weight: 800; font-size: 1rem; color: var(--text-primary); display: block;">ATS Recruiter Scorecard</span>
-                <span id="resume-match-tier-label" style="font-size: 0.78rem; color: var(--accent-emerald); font-weight: 600;">Strong Recruiter Match (Tier 1 Ready)</span>
+                <span id="resume-match-tier-label" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">No Resume Uploaded</span>
               </div>
               <div style="text-align: right;">
-                <span id="resume-ats-score-display" style="font-size: 1.6rem; font-weight: 900; color: var(--accent-emerald);">84%</span>
+                <span id="resume-ats-score-display" style="font-size: 1.6rem; font-weight: 900; color: var(--text-muted);">0%</span>
                 <div style="font-size: 0.72rem; color: var(--text-muted);">Weighted ATS Index</div>
               </div>
             </div>
@@ -694,19 +684,19 @@ PROJECTS:
             <div class="ats-metric-badges-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
               <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 0.72rem; color: var(--text-muted);">Contacts Found</div>
-                <div id="ats-contacts-count" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-emerald);">4/4 Verified</div>
+                <div id="ats-contacts-count" style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted);">0/4 Verified</div>
               </div>
               <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 0.72rem; color: var(--text-muted);">Tech Keywords</div>
-                <div id="ats-keywords-count" style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">14 Matched</div>
+                <div id="ats-keywords-count" style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted);">0 Matched</div>
               </div>
               <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 0.72rem; color: var(--text-muted);">Impact Metrics</div>
-                <div id="ats-metrics-count" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-amber);">3 Detected</div>
+                <div id="ats-metrics-count" style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted);">0 Detected</div>
               </div>
               <div class="ats-mini-stat" style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 0.72rem; color: var(--text-muted);">Action Verbs</div>
-                <div id="ats-verbs-count" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan);">4 Identified</div>
+                <div id="ats-verbs-count" style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted);">0 Identified</div>
               </div>
             </div>
 
@@ -714,19 +704,13 @@ PROJECTS:
             <div id="resume-keywords-chips-wrap" style="margin-bottom: 12px;">
               <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Identified Technical Competencies:</div>
               <div id="resume-keywords-chips" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                <span class="ats-chip ats-chip-matched">React</span>
-                <span class="ats-chip ats-chip-matched">Node.js</span>
-                <span class="ats-chip ats-chip-matched">Python</span>
-                <span class="ats-chip ats-chip-matched">SQL</span>
-                <span class="ats-chip ats-chip-matched">Docker</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Upload a resume above to scan and detect keywords</span>
               </div>
             </div>
 
             <!-- Detailed Recruiter Feedback List -->
             <div id="resume-feedback-list" style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
-              <div style="color: var(--accent-emerald); font-weight: 600; margin-bottom: 4px;">✓ Verified Contacts: Email, Phone, GitHub, LinkedIn detected</div>
-              <div style="color: var(--primary); font-weight: 600; margin-bottom: 4px;">✓ Matched 14 Core Tech Keywords: React, Node, Python, SQL, Docker, APIs...</div>
-              <div style="color: var(--accent-amber); font-weight: 600;">✓ Quantifiable Impact Metrics detected (e.g. 1,200+ users, 35% latency reduction)</div>
+              <div style="color: var(--text-muted); font-style: italic;">No resume uploaded yet. Upload your PDF, Word, or TXT resume to evaluate ATS score and recruiter keyword alignment.</div>
             </div>
           </div>
         </div>

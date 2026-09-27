@@ -170,7 +170,15 @@ export class HireScoreEngine {
         actionModal: 'skills-modal'
       });
     }
-    if (resumePoints < 13) {
+    if (resumePoints === 0) {
+      recommendations.push({
+        pillar: 'resume',
+        title: 'Upload Real Resume & Calculate ATS Score',
+        impact: '+10 to 15 pts',
+        actionLabel: 'Upload Resume',
+        actionModal: 'resume-modal'
+      });
+    } else if (resumePoints < 13) {
       recommendations.push({
         pillar: 'resume',
         title: 'Run ATS Resume Audit & Add Quantifiable Metrics',

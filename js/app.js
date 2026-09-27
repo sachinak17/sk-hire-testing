@@ -53,6 +53,12 @@ class App {
       this.updateHeroMetrics();
       if (event === 'auth_change') {
         this.updateAuthNav();
+        if (this.modules.dashboard) {
+          this.modules.dashboard.render();
+        }
+      }
+      if (event === 'resume_updated' && this.modules.dashboard && this.currentView === 'dashboard') {
+        this.modules.dashboard.render();
       }
     });
 

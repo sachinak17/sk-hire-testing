@@ -668,13 +668,28 @@ export class DashboardModule {
     const modal = document.getElementById('resume-modal');
     if (!modal) return;
 
+    // Refresh resume profile specifically for the active user
+    state.refreshCurrentUserResume();
+
     const resume = state.resumeProfile || {};
     const hasResume = !!(resume.fileName && resume.fileName.trim());
+    const currentUser = state.getCurrentUser();
+
+    // Show active user notice in modal header
+    const noticeEl = document.getElementById('resume-modal-user-notice');
+    if (noticeEl) {
+      if (currentUser) {
+        noticeEl.innerHTML = `👤 Profile Account: <strong>${currentUser.name || currentUser.email}</strong> &bull; Resumes & ATS scores are isolated specifically to this account.`;
+      } else {
+        noticeEl.innerHTML = `Resumes and ATS scores are saved specifically to your account.`;
+      }
+    }
     
     // Fill filename
     const filenameInput = document.getElementById('resume-filename');
     if (filenameInput) {
       filenameInput.value = hasResume ? resume.fileName : '';
+      filenameInput.placeholder = 'e.g. My_Resume.pdf';
     }
 
     // Fill target role
@@ -689,7 +704,7 @@ export class DashboardModule {
       if (hasResume && resume.extractedText) {
         // Sanitize any previous legacy binary or dirty tokens
         textarea.value = this.sanitizeResumeText(resume.extractedText);
-      } else if (!hasResume) {
+      } else {
         textarea.value = '';
       }
     }
@@ -702,7 +717,7 @@ export class DashboardModule {
     if (fileCard) {
       if (hasResume) {
         if (nameLabel) nameLabel.textContent = resume.fileName;
-        if (metaLabel) metaLabel.textContent = `${resume.fileSize || '142 KB'} • Last Audited: ${resume.lastAudited ? new Date(resume.lastAudited).toLocaleDateString() : 'Recent'}`;
+        if (metaLabel) metaLabel.textContent = `${resume.fileSize || 'Uploaded file'} • Last Audited: ${resume.lastAudited ? new Date(resume.lastAudited).toLocaleDateString() : 'Recent'}`;
         const ext = (resume.fileName.split('.').pop() || 'pdf').toUpperCase();
         if (formatIcon) formatIcon.textContent = ext === 'PDF' ? '📄 PDF' : (ext.includes('DOC') ? '📝 Word' : '📃 ' + ext);
         fileCard.style.display = 'flex';
@@ -719,7 +734,7 @@ export class DashboardModule {
     }
 
     // Run audit to display fresh scorecard
-    this.runAtsAudit();
+    this.runAtsAudit(false);
 
     modal.classList.add('active');
   }
@@ -865,21 +880,31 @@ export class DashboardModule {
       const fileName = document.getElementById('resume-filename')?.value.trim() || '';
       const text = document.getElementById('resume-paste-text')?.value || '';
       
+      if (!fileName && !text) {
+        this.app.showToast('Please upload a resume file or paste resume text before saving.', 'warning');
+        return;
+      }
+
       const audit = HireScoreEngine.auditResume(text, targetRole);
       const meta = this.currentUploadedResume || {};
+      const finalFileName = fileName || meta.name || (text ? 'Candidate_Resume.pdf' : '');
+      const finalSize = meta.size || state.resumeProfile.fileSize || (finalFileName ? 'Uploaded Document' : '');
+      const finalType = meta.type || state.resumeProfile.fileType || 'Document';
 
       state.updateResumeProfile({
         targetRole,
-        fileName: fileName || meta.name || (text ? 'Candidate_Resume.pdf' : ''),
-        fileSize: meta.size || state.resumeProfile.fileSize || (fileName ? '142 KB' : ''),
-        fileType: meta.type || state.resumeProfile.fileType || 'PDF Document',
+        fileName: finalFileName,
+        fileSize: finalSize,
+        fileType: finalType,
         atsScore: audit.atsScore,
-        highlights: fileName ? `Scored ${audit.atsScore}% ATS compatibility with ${audit.matchedKeywords.length} verified keywords for ${targetRole}.` : 'No resume uploaded.',
+        highlights: finalFileName ? `Scored ${audit.atsScore}% ATS compatibility with ${audit.matchedKeywords.length} verified keywords for ${targetRole}.` : 'No resume uploaded yet.',
         extractedText: text
       });
 
       document.getElementById('resume-modal')?.classList.remove('active');
-      this.app.showToast(fileName ? `Real resume "${fileName}" saved! Total Hire Score recalculated.` : 'Resume settings updated.', 'success');
+      const currentUser = state.getCurrentUser();
+      const userName = currentUser?.name || 'your profile';
+      this.app.showToast(finalFileName ? `Resume "${finalFileName}" saved for ${userName}! ATS Score: ${audit.atsScore}%.` : 'Resume profile updated.', 'success');
       this.render();
     });
   }
@@ -889,16 +914,8 @@ export class DashboardModule {
       return;
     }
 
-    // Reset state
-    state.updateResumeProfile({
-      fileName: '',
-      fileSize: '',
-      fileType: '',
-      atsScore: 0,
-      lastAudited: null,
-      highlights: 'No resume uploaded yet. Upload a resume from drive to calculate your ATS Score.',
-      extractedText: ''
-    });
+    // Reset state for current user
+    state.removeResumeProfile();
 
     this.currentUploadedResume = null;
 
@@ -920,7 +937,7 @@ export class DashboardModule {
 
     // Re-render dashboard
     this.render();
-    this.app.showToast('Current resume removed from profile.', 'info');
+    this.app.showToast('Current resume removed from your profile.', 'info');
   }
 
   async processResumeFile(file) {
@@ -994,7 +1011,24 @@ export class DashboardModule {
 
       // Auto-run ATS Audit
       this.runAtsAudit(false);
-      this.app.showToast(`Real resume "${file.name}" successfully parsed from drive!`, 'success');
+
+      // Auto-save strictly to the current user's profile
+      const targetRole = document.getElementById('resume-target-role')?.value.trim() || 'Software Development Engineer (SDE-1)';
+      const audit = HireScoreEngine.auditResume(extractedText || '', targetRole);
+      state.updateResumeProfile({
+        targetRole,
+        fileName: file.name,
+        fileSize: sizeStr,
+        fileType: fileTypeLabel,
+        atsScore: audit.atsScore,
+        highlights: `Scored ${audit.atsScore}% ATS compatibility with ${audit.matchedKeywords.length} verified keywords for ${targetRole}.`,
+        extractedText: extractedText || ''
+      });
+
+      const currentUser = state.getCurrentUser();
+      const userName = currentUser?.name || 'your profile';
+      this.app.showToast(`Resume "${file.name}" uploaded and saved for ${userName}! ATS Score: ${audit.atsScore}%.`, 'success');
+      this.render();
 
     } catch (err) {
       console.error('Error parsing resume file:', err);
@@ -1115,9 +1149,9 @@ export class DashboardModule {
       return `[Note: Scanned or image-based PDF detected with no digital text layer.
 Please paste your resume text below to run instant automated ATS analysis (detects keywords, metrics, github, linkedin, contact info)...]
 
-${state.currentUser?.name || 'Sachin A K'}
-Email: ${state.currentUser?.email || 'sachin@candidate.com'} | Phone: +91 9876543210
-GitHub: https://github.com/sachinak | LinkedIn: https://linkedin.com/in/sachinak
+${state.currentUser?.name || 'Candidate Name'}
+Email: ${state.currentUser?.email || 'candidate@example.com'} | Phone: +91 9876543210
+GitHub: https://github.com/candidate | LinkedIn: https://linkedin.com/in/candidate
 Target Role: Software Development Engineer
 
 TECHNICAL SKILLS:
@@ -1168,7 +1202,25 @@ PROJECTS:
     };
 
     this.runAtsAudit(false);
-    this.app.showToast(`Google Drive resume linked and verified!`, 'success');
+    
+    // Auto-save strictly to the current user's profile
+    const text = document.getElementById('resume-paste-text')?.value || '';
+    const role = document.getElementById('resume-target-role')?.value || 'Software Development Engineer (SDE-1)';
+    const audit = HireScoreEngine.auditResume(text, role);
+    state.updateResumeProfile({
+      targetRole: role,
+      fileName: docName,
+      fileSize: 'Cloud Drive',
+      fileType: 'Google Drive Document',
+      atsScore: audit.atsScore,
+      highlights: `Linked from Google Drive. Scored ${audit.atsScore}% ATS score.`,
+      extractedText: text
+    });
+
+    const currentUser = state.getCurrentUser();
+    const userName = currentUser?.name || 'your profile';
+    this.app.showToast(`Google Drive resume linked and saved for ${userName}! ATS Score: ${audit.atsScore}%.`, 'success');
+    this.render();
   }
 
   runAtsAudit(showToast = false) {
@@ -1193,55 +1245,83 @@ PROJECTS:
     const chipsContainer = document.getElementById('resume-keywords-chips');
     const feedbackEl = document.getElementById('resume-feedback-list');
 
+    const isZero = !audit.atsScore || audit.atsScore === 0;
+
     if (scoreEl) {
       scoreEl.textContent = `${audit.atsScore}%`;
-      if (audit.atsScore >= 85) scoreEl.style.color = 'var(--accent-emerald)';
+      if (isZero) scoreEl.style.color = 'var(--text-muted)';
+      else if (audit.atsScore >= 85) scoreEl.style.color = 'var(--accent-emerald)';
       else if (audit.atsScore >= 70) scoreEl.style.color = 'var(--primary)';
       else if (audit.atsScore >= 55) scoreEl.style.color = 'var(--accent-amber)';
       else scoreEl.style.color = 'var(--accent-rose)';
     }
 
     if (tierLabelEl) {
-      tierLabelEl.textContent = audit.tierLabel;
-      if (audit.atsScore >= 85) tierLabelEl.style.color = 'var(--accent-emerald)';
+      tierLabelEl.textContent = isZero ? 'No Resume Uploaded' : audit.tierLabel;
+      if (isZero) tierLabelEl.style.color = 'var(--text-muted)';
+      else if (audit.atsScore >= 85) tierLabelEl.style.color = 'var(--accent-emerald)';
       else if (audit.atsScore >= 70) tierLabelEl.style.color = 'var(--primary)';
       else tierLabelEl.style.color = 'var(--accent-amber)';
     }
 
-    if (contactsCountEl) contactsCountEl.textContent = `${audit.contactsCount}/4 Verified`;
-    if (keywordsCountEl) keywordsCountEl.textContent = `${audit.matchedKeywords.length} Matched`;
-    if (metricsCountEl) metricsCountEl.textContent = `${audit.metricCount} Detected`;
-    if (verbsCountEl) verbsCountEl.textContent = `${audit.matchedVerbs.length} Identified`;
+    if (contactsCountEl) {
+      contactsCountEl.textContent = `${audit.contactsCount}/4 Verified`;
+      contactsCountEl.style.color = isZero ? 'var(--text-muted)' : 'var(--accent-emerald)';
+    }
+    if (keywordsCountEl) {
+      keywordsCountEl.textContent = `${audit.matchedKeywords.length} Matched`;
+      keywordsCountEl.style.color = isZero ? 'var(--text-muted)' : 'var(--primary)';
+    }
+    if (metricsCountEl) {
+      metricsCountEl.textContent = `${audit.metricCount} Detected`;
+      metricsCountEl.style.color = isZero ? 'var(--text-muted)' : 'var(--accent-amber)';
+    }
+    if (verbsCountEl) {
+      verbsCountEl.textContent = `${audit.matchedVerbs.length} Identified`;
+      verbsCountEl.style.color = isZero ? 'var(--text-muted)' : 'var(--accent-cyan)';
+    }
 
     // Render keyword chips
     if (chipsContainer) {
-      const matchedChips = audit.matchedKeywords.slice(0, 10).map(k => `
-        <span class="ats-chip ats-chip-matched">✓ ${k}</span>
-      `).join('');
+      if (isZero || (audit.matchedKeywords.length === 0 && (!audit.missingKeywords || audit.missingKeywords.length === 0))) {
+        chipsContainer.innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Upload a resume above to scan and detect keywords</span>';
+      } else {
+        const matchedChips = audit.matchedKeywords.slice(0, 10).map(k => `
+          <span class="ats-chip ats-chip-matched">✓ ${k}</span>
+        `).join('');
 
-      const missingChips = audit.missingKeywords.slice(0, 4).map(k => `
-        <span class="ats-chip ats-chip-missing">+ ${k}</span>
-      `).join('');
+        const missingChips = audit.missingKeywords.slice(0, 4).map(k => `
+          <span class="ats-chip ats-chip-missing">+ ${k}</span>
+        `).join('');
 
-      chipsContainer.innerHTML = (matchedChips + missingChips) || '<span style="font-size: 0.8rem; color: var(--text-muted);">No core keywords matched yet</span>';
+        chipsContainer.innerHTML = (matchedChips + missingChips) || '<span style="font-size: 0.8rem; color: var(--text-muted);">No core keywords matched yet</span>';
+      }
     }
 
     // Render detailed feedback
     if (feedbackEl) {
-      feedbackEl.innerHTML = `
-        <div style="color: var(--accent-emerald); font-weight: 600; margin-bottom: 4px;">
-          ✓ Verified Contacts: ${audit.contacts.hasEmail ? 'Email, ' : ''}${audit.contacts.hasPhone ? 'Phone, ' : ''}${audit.contacts.hasGithub ? 'GitHub, ' : ''}${audit.contacts.hasLinkedin ? 'LinkedIn' : ''} detected (${audit.contactsCount}/4)
-        </div>
-        <div style="color: var(--primary); font-weight: 600; margin-bottom: 4px;">
-          ✓ Matched ${audit.matchedKeywords.length} Technical Skills: ${audit.matchedKeywords.slice(0, 6).join(', ')}...
-        </div>
-        ${audit.hasMetrics ? `
-          <div style="color: var(--accent-amber); font-weight: 600; margin-bottom: 4px;">
-            ✓ Quantifiable Impact Metrics detected (${audit.metricCount} measurement points found)
+      if (isZero) {
+        feedbackEl.innerHTML = `
+          <div style="color: var(--text-muted); font-style: italic;">
+            No resume uploaded yet. Upload a real PDF, Word, or TXT resume above from your drive or computer to evaluate your ATS score and recruiter keyword alignment.
           </div>
-        ` : ''}
-        ${audit.feedback.map(f => `<div style="color: var(--text-secondary); margin-bottom: 2px;">• ${f}</div>`).join('')}
-      `;
+        `;
+      } else {
+        feedbackEl.innerHTML = `
+          <div style="color: var(--accent-emerald); font-weight: 600; margin-bottom: 4px;">
+            ✓ Verified Contacts: ${audit.contacts.hasEmail ? 'Email, ' : ''}${audit.contacts.hasPhone ? 'Phone, ' : ''}${audit.contacts.hasGithub ? 'GitHub, ' : ''}${audit.contacts.hasLinkedin ? 'LinkedIn' : ''} detected (${audit.contactsCount}/4)
+          </div>
+          <div style="color: var(--primary); font-weight: 600; margin-bottom: 4px;">
+            ✓ Matched ${audit.matchedKeywords.length} Technical Skills: ${audit.matchedKeywords.slice(0, 6).join(', ')}...
+          </div>
+          ${audit.hasMetrics ? `
+            <div style="color: var(--accent-amber); font-weight: 600; margin-bottom: 4px;">
+              ✓ Quantifiable Impact Metrics detected (${audit.metricCount} measurement points found)
+            </div>
+          ` : ''}
+          ${audit.feedback.map(f => `<div style="color: var(--text-secondary); margin-bottom: 2px;">• ${f}</div>`).join('')}
+        `;
+      }
     }
   }
 }

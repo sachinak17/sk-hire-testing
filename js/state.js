@@ -44,14 +44,15 @@ const DEFAULT_PROJECTS = [
   }
 ];
 
-const DEFAULT_RESUME = {
-  fileName: 'Sachin_AK_Software_Engineer_Resume.pdf',
-  fileSize: '142 KB',
-  fileType: 'PDF Document',
+export const EMPTY_RESUME = {
+  fileName: '',
+  fileSize: '',
+  fileType: '',
   targetRole: 'Software Development Engineer (SDE-1)',
-  atsScore: 84,
-  lastAudited: new Date().toISOString(),
-  highlights: 'High compatibility match for Software Engineering roles (14 matched keywords, 4 impact metrics).'
+  atsScore: 0,
+  lastAudited: null,
+  highlights: 'No resume uploaded yet. Upload your resume from drive or device to calculate ATS Score.',
+  extractedText: ''
 };
 
 const DEFAULT_INTERVIEW = {
@@ -85,10 +86,61 @@ class StateManager {
     // Hire Score Components State
     this.studentSkills = JSON.parse(localStorage.getItem(STORAGE_KEYS.STUDENT_SKILLS) || JSON.stringify(DEFAULT_SKILLS));
     this.studentProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.STUDENT_PROJECTS) || JSON.stringify(DEFAULT_PROJECTS));
-    this.resumeProfile = JSON.parse(localStorage.getItem(STORAGE_KEYS.RESUME_PROFILE) || JSON.stringify(DEFAULT_RESUME));
+    
+    // Resume is strictly user-scoped (every different user must upload their own resume)
+    this.resumeProfile = this.loadUserResumeProfile(this.currentUser);
     this.interviewProfile = JSON.parse(localStorage.getItem(STORAGE_KEYS.INTERVIEW_PROFILE) || JSON.stringify(DEFAULT_INTERVIEW));
     
     this.listeners = [];
+  }
+
+  getUserKey(user = this.currentUser) {
+    if (!user) return 'guest';
+    const id = user.uid || user.email || user.name || 'guest';
+    return String(id).toLowerCase().trim().replace(/[^a-z0-9_-]/g, '_');
+  }
+
+  getResumeStorageKey(user = this.currentUser) {
+    const userKey = this.getUserKey(user);
+    return `${STORAGE_KEYS.RESUME_PROFILE}_${userKey}`;
+  }
+
+  loadUserResumeProfile(user = this.currentUser) {
+    // Purge legacy dummy default resume if lingering in global key
+    try {
+      const legacy = localStorage.getItem(STORAGE_KEYS.RESUME_PROFILE);
+      if (legacy) {
+        const parsed = JSON.parse(legacy);
+        if (parsed?.fileName && parsed.fileName.includes('Sachin_AK_')) {
+          localStorage.removeItem(STORAGE_KEYS.RESUME_PROFILE);
+        }
+      }
+    } catch (e) {}
+
+    const key = this.getResumeStorageKey(user);
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            ...EMPTY_RESUME,
+            ...parsed
+          };
+        }
+      } catch (e) {
+        console.warn('Error parsing resume profile from localStorage:', e);
+      }
+    }
+
+    // Default: Every user starts fresh with no resume until they upload one
+    return JSON.parse(JSON.stringify(EMPTY_RESUME));
+  }
+
+  refreshCurrentUserResume() {
+    this.currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.AUTH_USER) || 'null');
+    this.resumeProfile = this.loadUserResumeProfile(this.currentUser);
+    return this.resumeProfile;
   }
 
   subscribe(callback) {
@@ -261,13 +313,28 @@ class StateManager {
   }
 
   updateResumeProfile(resumeData) {
+    const hasFileName = Boolean(resumeData.fileName && resumeData.fileName.trim());
     this.resumeProfile = {
       ...this.resumeProfile,
       ...resumeData,
-      lastAudited: new Date().toISOString()
+      lastAudited: hasFileName ? new Date().toISOString() : null
     };
-    localStorage.setItem(STORAGE_KEYS.RESUME_PROFILE, JSON.stringify(this.resumeProfile));
+
+    // Save strictly to user-scoped storage key
+    const key = this.getResumeStorageKey(this.currentUser);
+    localStorage.setItem(key, JSON.stringify(this.resumeProfile));
+
     this.notify('hire_score_updated', this.getHireScore());
+    this.notify('resume_updated', this.resumeProfile);
+  }
+
+  removeResumeProfile() {
+    this.resumeProfile = JSON.parse(JSON.stringify(EMPTY_RESUME));
+    const key = this.getResumeStorageKey(this.currentUser);
+    localStorage.removeItem(key);
+
+    this.notify('hire_score_updated', this.getHireScore());
+    this.notify('resume_updated', this.resumeProfile);
   }
 
   recordStarStory(story) {
@@ -307,14 +374,18 @@ class StateManager {
       lastLogin: new Date().toISOString()
     };
     localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(this.currentUser));
+    this.resumeProfile = this.loadUserResumeProfile(this.currentUser);
     this.notify('auth_change', this.currentUser);
+    this.notify('hire_score_updated', this.getHireScore());
     return this.currentUser;
   }
 
   logout() {
     this.currentUser = null;
     localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+    this.resumeProfile = JSON.parse(JSON.stringify(EMPTY_RESUME));
     this.notify('auth_change', null);
+    this.notify('hire_score_updated', this.getHireScore());
   }
 
   // Reset demo data
@@ -329,6 +400,7 @@ class StateManager {
 
     localStorage.removeItem(STORAGE_KEYS.STUDENT_SKILLS);
     localStorage.removeItem(STORAGE_KEYS.STUDENT_PROJECTS);
+    localStorage.removeItem(this.getResumeStorageKey(this.currentUser));
     localStorage.removeItem(STORAGE_KEYS.RESUME_PROFILE);
     localStorage.removeItem(STORAGE_KEYS.INTERVIEW_PROFILE);
 
@@ -341,7 +413,7 @@ class StateManager {
     this.customJobs = [];
     this.studentSkills = [...DEFAULT_SKILLS];
     this.studentProjects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
-    this.resumeProfile = JSON.parse(JSON.stringify(DEFAULT_RESUME));
+    this.resumeProfile = JSON.parse(JSON.stringify(EMPTY_RESUME));
     this.interviewProfile = JSON.parse(JSON.stringify(DEFAULT_INTERVIEW));
 
     this.notify('state_reset', null);
