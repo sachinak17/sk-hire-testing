@@ -5,6 +5,7 @@
 
 import { PREP_DATA } from '../data/prepData.js';
 import { state } from '../state.js';
+import { AnimatedBackground } from './animatedBackground.js';
 
 export class PrepModule {
   constructor(app) {
@@ -12,6 +13,7 @@ export class PrepModule {
     this.activeTab = 'technical'; // 'technical' | 'hr'
     this.activeSubcatId = 'os';
     this.currentQuiz = null;
+    this.prepTabsAnimatedBg = null;
     this.quizState = {
       questions: [],
       currentIndex: 0,
@@ -43,7 +45,18 @@ export class PrepModule {
         if (this.activeTab === 'technical') this.activeSubcatId = 'os';
         else if (this.activeTab === 'aptitude') this.activeSubcatId = 'quant';
 
+        if (this.prepTabsAnimatedBg) {
+          this.prepTabsAnimatedBg.refresh();
+        }
+
         this.render();
+      });
+
+      this.prepTabsAnimatedBg = new AnimatedBackground(tabNav, {
+        itemSelector: '.prep-tab-btn',
+        activeClass: 'active',
+        enableHover: true,
+        transitionDuration: '0.36s'
       });
     }
 

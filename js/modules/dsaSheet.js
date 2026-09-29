@@ -6,6 +6,7 @@
 import { DSA_TOPICS, DSA_PROBLEMS } from '../data/dsaSheetData.js';
 import { DSA_TEST_SUITES, testProblemCode } from './dsaRunner.js';
 import { state } from '../state.js';
+import { AnimatedBackground } from './animatedBackground.js';
 
 export class DsaSheetModule {
   constructor(app) {
@@ -18,6 +19,7 @@ export class DsaSheetModule {
     this.currentSolveProblem = null;
     this.activeCodeLang = 'cpp';
     this.activeSolverLang = 'javascript';
+    this.solverTabsAnimatedBg = null;
   }
 
   init() {
@@ -137,11 +139,21 @@ export class DsaSheetModule {
     // Solver: Language Switcher Tabs
     const solverLangTabs = document.getElementById('solver-lang-tabs');
     if (solverLangTabs) {
+      this.solverTabsAnimatedBg = new AnimatedBackground(solverLangTabs, {
+        itemSelector: '.lang-tab-btn',
+        activeClass: 'active',
+        enableHover: true,
+        transitionDuration: '0.32s'
+      });
+
       solverLangTabs.querySelectorAll('.lang-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           solverLangTabs.querySelectorAll('.lang-tab-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           this.activeSolverLang = btn.dataset.solverLang;
+          if (this.solverTabsAnimatedBg) {
+            this.solverTabsAnimatedBg.refresh();
+          }
           this.renderSolverCode();
         });
       });
@@ -496,6 +508,9 @@ export class DsaSheetModule {
 
     this.renderSolverCode();
     modal.classList.add('active');
+    if (this.solverTabsAnimatedBg) {
+      requestAnimationFrame(() => this.solverTabsAnimatedBg.refresh(true));
+    }
   }
 
   renderSolverCode() {

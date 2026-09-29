@@ -345,6 +345,13 @@
   position: relative;
 }
 
+/* Auth Sliding Pill (motion-primitives style) */
+.auth-tabs .animated-bg-pill {
+  border-radius: 8px;
+  background: var(--gradient-cta);
+  box-shadow: 0 4px 18px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
 .auth-tab-btn {
   flex: 1;
   text-align: center;
@@ -356,14 +363,32 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast);
+  position: relative;
   z-index: 2;
+  user-select: none;
+}
+
+.auth-tab-btn:hover {
+  color: var(--text-primary);
 }
 
 .auth-tab-btn.active {
   color: #fff;
   background: var(--gradient-cta);
   box-shadow: 0 4px 18px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* When animated sliding background is active, the single pill handles the visual background */
+.auth-tabs.has-animated-bg .auth-tab-btn {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.auth-tabs.has-animated-bg .auth-tab-btn.active {
+  color: #ffffff;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 /* Social Buttons Row */

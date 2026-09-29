@@ -10,6 +10,7 @@ import {
   firebasePasswordReset, 
   firebaseSignOut 
 } from './firebase-config.js';
+import { AnimatedBackground } from './modules/animatedBackground.js';
 
 const STORAGE_KEYS = {
   THEME: 'hirecraft_theme',
@@ -20,6 +21,7 @@ class AuthController {
   constructor() {
     this.currentTab = 'login'; // 'login' | 'register'
     this.theme = localStorage.getItem(STORAGE_KEYS.THEME) || 'dark';
+    this.tabsAnimatedBg = null;
     this.init();
   }
 
@@ -93,6 +95,10 @@ class AuthController {
       if (titleEl) titleEl.textContent = 'Create Your Account';
       if (subtitleEl) subtitleEl.textContent = 'Join thousands of engineers accelerating their careers Zero to Hero.';
     }
+
+    if (this.tabsAnimatedBg) {
+      this.tabsAnimatedBg.refresh();
+    }
   }
 
   bindEvents() {
@@ -103,6 +109,17 @@ class AuthController {
     // Tab buttons
     document.getElementById('tab-btn-login')?.addEventListener('click', () => this.switchTab('login'));
     document.getElementById('tab-btn-register')?.addEventListener('click', () => this.switchTab('register'));
+
+    // Initialize motion-primitives animated sliding background for auth tabs
+    const authTabs = document.querySelector('.auth-tabs');
+    if (authTabs) {
+      this.tabsAnimatedBg = new AnimatedBackground(authTabs, {
+        itemSelector: '.auth-tab-btn',
+        activeClass: 'active',
+        enableHover: true,
+        transitionDuration: '0.36s'
+      });
+    }
 
     // Password Toggles
     document.querySelectorAll('.btn-toggle-pwd').forEach(btn => {

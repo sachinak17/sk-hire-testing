@@ -9,6 +9,7 @@ import { PrepModule } from './modules/prep.js';
 import { CompaniesModule } from './modules/companies.js';
 import { DsaSheetModule } from './modules/dsaSheet.js';
 import { DashboardModule } from './modules/dashboard.js';
+import { AnimatedBackground } from './modules/animatedBackground.js';
 import { DSA_PROBLEMS } from './data/dsaSheetData.js';
 import { COMPANIES_DATA } from './data/companiesData.js';
 import { INITIAL_JOBS } from './data/jobsData.js';
@@ -18,6 +19,7 @@ class App {
   constructor() {
     this.currentView = 'jobs'; // 'jobs' | 'prep' | 'companies' | 'dsa' | 'dashboard'
     this.modules = {};
+    this.navAnimatedBg = null;
   }
 
   init() {
@@ -93,6 +95,17 @@ class App {
       });
     });
 
+    // Initialize motion-primitives animated sliding background for navigation
+    const mainNav = document.querySelector('.main-nav');
+    if (mainNav) {
+      this.navAnimatedBg = new AnimatedBackground(mainNav, {
+        itemSelector: '.nav-item',
+        activeClass: 'active',
+        enableHover: true,
+        transitionDuration: '0.36s'
+      });
+    }
+
     // Brand logo click returns to jobs
     const brandLogo = document.querySelector('.brand-logo');
     if (brandLogo) {
@@ -139,6 +152,11 @@ class App {
       item.classList.toggle('active', isActive);
       item.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
+
+    // Update sliding background pill position
+    if (this.navAnimatedBg) {
+      this.navAnimatedBg.refresh();
+    }
 
     // Show active section
     document.querySelectorAll('.view-section').forEach(sec => {
